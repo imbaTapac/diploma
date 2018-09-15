@@ -1,8 +1,12 @@
 package student_rating.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -11,52 +15,73 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "student")
-public class Student implements Serializable{
+@JsonIgnoreProperties(value = {"roles"})
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Long.class)
+public class Student implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column
-    private long id_student;
+    @Column(name = "id_student")
+    private long id;
+
     @Column
     private String username;
+
     @Column
     private String password;
-    @Column
-    private String student_name;
-    @Column
-    private String student_surname;
-    @Column
-    private String faculty;
-    @Column
+
+    @Column(name = "student_name", columnDefinition = "VARCHAR(56)")
+    private String studentName;
+
+    @Column(name = "student_surname", columnDefinition = "VARCHAR(56)")
+    private String studentSurname;
+
+    @Column(name = "course",columnDefinition = "INTEGER(1)")
+    private Integer course;
+
+    @Column(columnDefinition = "VARCHAR(18)")
     private String phone;
+
+    @Column(columnDefinition = "VARCHAR(128)")
+    private String email;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "student_roles", joinColumns = @JoinColumn(name = "student_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Roles> roles;
 
-    @OneToMany(cascade = CascadeType.ALL)
+
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "id_student")
     public List<Rating> ratings;
+
+
+    @ManyToOne
+    @JoinColumn(name = "id_okr")
+    private OKR okr;
+
+    @ManyToOne
+    @JoinColumn(name = "id_group")
+    private Group group;
+
 
     public Student() {
     }
 
-    public Student(String username,String password, String student_name, String student_surname, String faculty, String phone) {
+    public Student(String username, String password, String studentName, String studentSurname, String phone) {
         this.username = username;
-        this.password=password;
-        this.student_name = student_name;
-        this.student_surname = student_surname;
-        this.faculty = faculty;
+        this.password = password;
+        this.studentName = studentName;
+        this.studentSurname = studentSurname;
         this.phone = phone;
     }
 
 
-    public long getId_student() {
-        return id_student;
+    public long getId() {
+        return id;
     }
 
-    public void setId_student(long id_student) {
-        this.id_student = id_student;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -75,28 +100,28 @@ public class Student implements Serializable{
         this.password = password;
     }
 
-    public String getStudent_name() {
-        return student_name;
+    public String getStudentName() {
+        return studentName;
     }
 
-    public void setStudent_name(String student_name) {
-        this.student_name = student_name;
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
     }
 
-    public String getStudent_surname() {
-        return student_surname;
+    public String getStudentSurname() {
+        return studentSurname;
     }
 
-    public void setStudent_surname(String student_surname) {
-        this.student_surname = student_surname;
+    public void setStudentSurname(String studentSurname) {
+        this.studentSurname = studentSurname;
     }
 
-    public String getFaculty() {
-        return faculty;
+    public Integer getCourse() {
+        return course;
     }
 
-    public void setFaculty(String faculty) {
-        this.faculty = faculty;
+    public void setCourse(Integer course) {
+        this.course = course;
     }
 
     public String getPhone() {
@@ -105,6 +130,14 @@ public class Student implements Serializable{
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Set<Roles> getRoles() {
@@ -121,5 +154,37 @@ public class Student implements Serializable{
 
     public void setRatings(List<Rating> ratings) {
         this.ratings = ratings;
+    }
+
+    public OKR getOkr() {
+        return okr;
+    }
+
+    public void setOkr(OKR okr) {
+        this.okr = okr;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", studentName='" + studentName + '\'' +
+                ", studentSurname='" + studentSurname + '\'' +
+                ", course=" + course +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", okr=" + okr +
+                ", group=" + group +
+                '}';
     }
 }

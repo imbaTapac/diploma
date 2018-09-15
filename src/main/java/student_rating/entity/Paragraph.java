@@ -1,5 +1,10 @@
 package student_rating.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
@@ -9,34 +14,37 @@ import java.util.List;
  */
 @Entity
 @Table(name = "paraghaph")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Long.class)
 public class Paragraph implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
-    private long id_paragraph;
+    @Column(name = "id_paragraph")
+    private long id;
 
-    @Column
+    @Column(columnDefinition = "NVARCHAR(512)")
     String name;
 
-    @Column
+    @Column(columnDefinition = "NVARCHAR(6)")
     String score;
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_subblock")
     public Subblock subblock;
 
-    @OneToMany(cascade = CascadeType.ALL)
+
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "id_paragraph")
     public List<Rating> ratings;
 
     public Paragraph() {
     }
 
-    public long getId_paragraph() {
-        return id_paragraph;
+    public long getId() {
+        return id;
     }
 
-    public void setId_paragraph(long id_paragraph) {this.id_paragraph = id_paragraph;}
+    public void setId(long id) {this.id = id;}
 
     public String getName() {
         return name;
@@ -68,5 +76,14 @@ public class Paragraph implements Serializable{
 
     public void setRatings(List<Rating> ratings) {
         this.ratings = ratings;
+    }
+
+    @Override
+    public String toString() {
+        return "Paragraph{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", score='" + score + '\'' +
+                '}';
     }
 }

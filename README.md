@@ -1,1 +1,0 @@
-# This project should facilitate the calculation of the student's rating for receiving a scholarship.

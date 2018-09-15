@@ -17,17 +17,12 @@
 
     <title><spring:message code="title_login_page" /></title>
 
-    <link href="${contextPath}/pages/css/bootstrap.min.css" rel="stylesheet">
     <link href="${contextPath}/pages/css/common.css" rel="stylesheet">
+    <link href="${contextPath}/pages/css/footer.css" rel="stylesheet">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-
-    <!-- Bootstrap core CSS -->
-    <link href="<c:url value="${contextPath}/pages/css/bootstrap.css" />" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link href="<c:url value="${contextPath}/pages/css/jumbotron-narrow.css" />" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 
 <body>
@@ -42,33 +37,51 @@
 	
     <c:url value="/j_spring_security_check" var="loginUrl" />
 
+    <div class="main-img">
+        <img src="/pages/picture/NULES_logo.png" class="image-center">
+    </div>
+    <h2 class="form-heading" align="center">Інформаційна система <br>"Визначення рейтингу студента"</h2>
     <form method="POST" action="${loginUrl}" class="form-signin">
-        <h2 class="form-heading" align="center"><spring:message code="enter_data" /></h2>
+
 
         <div class="form-group ${error !=null ? 'has-error':''}">
-           <%--<span>${message}</span>--%>
 
             <input name="username" type="text" class="form-control" placeholder="<spring:message code="username" />"
                    autofocus="true"/>
 
-            <input name="password" type="password" class="form-control" placeholder="<spring:message code="password" />"
-            />
-
-
+            <input name="password" type="password" class="form-control" placeholder="<spring:message code="password" />"/>
 
             <span>${error}</span>
             <input type="hidden" name="${_csrf.parametrName}" value="${_csrf.token}"/>
 
             <button class="btn btn-lg btn-primary btn-block" type="submit"><spring:message code="login"/></button>
-            <h4 class="text-center"><a href="${contextPath}/registration"><spring:message code="create_acc" /></a></h4>
         </div>
 
     </form>
 
 
-    <div class="footer">
-        <p>&copy; Tarasii 2018</p>
-    </div>
+    <footer class="page-footer font-small blue-grey lighten-5 mt-4">
+        <div class="footer-copyright text-center text-black-50 py-2">
+            <p>&copy; Tarasii 2018 «НУБІП УКРАЇНИ»</p>
+            <p class="font_8">Наші соц мережі</p>
+            <div class="social">
+                <ul>
+                    <li>
+                        <a href="https://www.facebook.com/nubip.edu.ua/?ref=br_rs" target="_blank"
+                           data-content="https://www.facebook.com/nubip.edu.ua/?ref=br_rs" data-type="external"
+                           rel="nofollow" id="LnkBr00imagelink" class="lb1imageItemlink">
+                            <img id="LnkBr00imageimageimage" class="link" src="https://static.wixstatic.com/media/ed86bdfa6aecf88649d305e11d76ac33.wix_mp/v1/fill/w_23,h_23,al_c,usm_0.66_1.00_0.01/ed86bdfa6aecf88649d305e11d76ac33.wix_mp"></a>
+                    </li>
+                    <li>
+                        <a href="https://www.youtube.com/channel/UC-U1fqRT0jeRLUUDcMq1uaw" target="_blank"
+                           data-content="https://www.youtube.com/channel/UC-U1fqRT0jeRLUUDcMq1uaw" data-type="external"
+                           rel="nofollow" id="LnkBr01imagelink" class="lb1imageItemlink">
+                            <img id="LnkBr01imageimageimage" class="link" src="https://static.wixstatic.com/media/45bce1d726f64f1999c49feae57f6298.png/v1/fill/w_23,h_23,al_c,usm_0.66_1.00_0.01/45bce1d726f64f1999c49feae57f6298.png"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </footer>
 
 </div>
 <!-- /container -->

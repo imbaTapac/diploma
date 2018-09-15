@@ -15,129 +15,177 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title><spring:message code="title_main_page"/> </title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="${contextPath}/pages/resources/js/bootstrap.min.js"></script>
+    <title><spring:message code="title_main_page"/></title>
 
-    <link href="${contextPath}/pages/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<c:url value="${contextPath}/pages/css/bootstrap.css" />" rel="stylesheet">
 
-    <link href="${contextPath}/pages/css/style.css" rel="stylesheet">
+    <link href="${contextPath}/pages/css/welcome.css" rel="stylesheet">
+    <link href="${contextPath}/pages/css/footer.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
-<body>
-
-
+<div class="wrapper">
 <div class="container">
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <!--Название сайта и кнопка раскрытия меню для мобильных-->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Stud_Rating</a>
+            </div>
 
-    <div class="page-header">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <c:choose>
+                        <c:when test="${requestScope.role=='[ROLE_HEAD_OF_GROUP]' || requestScope.role=='[ROLE_HEAD_OF_SO]'}">
+                            <li><a href="/welcome"><span class="glyphicon glyphicon-home"></span>Головна</a></li>
+                            <li><a href="/profile"><span class="glyphicon glyphicon-user"></span>Профіль</a></li>
+                            <li><a href="/rating"><span class="glyphicon glyphicon-pencil"></span>Заповнити рейтинг</a></li>
+                            <li><a href="/students"><span class="glyphicon glyphicon-search"></span>Мої студенти</a></li>
+                            <li><a href="/check_rating"><span class="glyphicon glyphicon-pencil"></span>Перевірити рейтинг</a></li>
+                            <li><a href="/reports"><span class="glyphicon glyphicon-file"></span>Звіти</a></li>
+                        </c:when>
+                        <c:when test="${requestScope.role=='[ROLE_STUDENT]'}">
+                            <li><a href="/welcome"><span class="glyphicon glyphicon-home"></span>Головна</a></li>
+                            <li><a href="/profile"><span class="glyphicon glyphicon-user"></span>Профіль</a></li>
+                            <li><a href="/rating"><span class="glyphicon glyphicon-pencil"></span>Заповнити рейтинг</a></li>
+                        </c:when>
+                    </c:choose>
+                </ul>
 
-        <span class="lang">
-            <a href="?lang=en"><img src="/pages/picture/united-kingdom_l.png" width="25" height="15"></a>
-            <a href="?lang=ru"><img src="/pages/picture/russia_l.png" width="25" height="15"></a>
-            <a href="?lang=uk"><img src="/pages/picture/ukraine_l.png" width="25" height="15"></a>
+                <c:if test="${pageContext.request.userPrincipal.name != null}">
+                    <form id="logoutForm" method="POST" action="${contextPath}/logout">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                    </form>
+                    <div class="pull-right">
+                        <div class="logout">
+                            <sec:authorize access="isAuthenticated()">
+                                <p><sec:authentication property="principal.username"/><a class="btn btn-sm btn-primary"
+                                                                                         href="<c:url value="/logout" />"
+                                                                                         role="button">Вийти</a></p>
+                            </sec:authorize>
+                        </div>
+                    </div>
+                </c:if>
 
+                <div class="pull-right">
+                    <div class="lang">
+                        <ul>
+                            <li><a href="?lang=en"><img src="/pages/picture/united-kingdom_l.png" width="25"
+                                                        height="15"></a></li>
+                            <li><a href="?lang=ru"><img src="/pages/picture/russia_l.png" width="25" height="15"></a>
+                            </li>
+                            <li><a href="?lang=uk"><img src="/pages/picture/ukraine_l.png" width="25" height="15"></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
 
-        <c:if test="${pageContext.request.userPrincipal.name != null}">
-        <form id="logoutForm" method="POST" action="${contextPath}/logout">
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </form>
-        <sec:authorize access="isAuthenticated()">
+    <div class="row">
+        <div class="col-6 col-md-3">
+            <textarea rows="5">Інформаційна система "Визначення рейтингу студента" призначена для полегшення збіру даних студентів про їх культурно-масове життя та їх перевірку</textarea>
+        </div>
 
-            <spring:message code="principal.username"/>:<sec:authentication property="principal.username" />
-            <a class="btn btn-lg btn-danger" href="<c:url value="/logout" />" role="button">Выйти</a>
-          </span>
-        </sec:authorize>
+        <!-- Catousel -->
+        <div class="col-12 col-sm-6 col-md-9">
+            <div id="thumbnail-preview-indicators" class="carousel slide" data-ride="carousel">
+                <!-- Indicators -->
+                <ol class="carousel-indicators">
+                    <li data-target="#thumbnail-preview-indicators" data-slide-to="0" class="active">
+                        <div class="thumbnail">
+                            <img class="img-responsive"
+                                 src="https://nubip.edu.ua/sites/default/files/imagecache/slide/18_07_pogoni.jpg">
+                        </div>
+                    </li>
+                    <li data-target="#thumbnail-preview-indicators" data-slide-to="1">
+                        <div class="thumbnail">
+                            <img class="img-responsive"
+                                 src="https://nubip.edu.ua/sites/default/files/imagecache/slide/18_05_22_fleshmob_nubip_02.jpg">
+                        </div>
+                    </li>
+                    <li data-target="#thumbnail-preview-indicators" data-slide-to="2">
+                        <div class="thumbnail">
+                            <img class="img-responsive"
+                                 src="https://nubip.edu.ua/sites/default/files/imagecache/slide/18_09_01_den_znan.jpg">
+                        </div>
+                    </li>
+                </ol>
+                <div class="carousel-inner">
+                    <div class="item slides active">
+                        <div class="slide-1"></div>
+                        <div class="container">
+                            <div class="carousel-caption">
+                                <h1>Підсумки військових зборів</h1>
+                                <p>Студенти кафедри військової підготовки завершили польові збори прийняттям присяги на вірність українському народов</p>
+                                <p class="lead"><a class="btn btn-lg btn-link" href="#" role="button"></a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item slides">
+                        <div class="slide-2"></div>
+                        <div class="container">
+                            <div class="carousel-caption">
+                                <h1>120 років НУБіП</h1>
+                                <p>Дві тисячі студентів на флешмобі відобразили малий герб НУБіП</p>
+                                <p><a class="btn btn-lg btn-link" href="#" role="button"></a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item slides">
+                        <div class="slide-3"></div>
+                        <div class="container">
+                            <div class="carousel-caption">
+                                <h1>1 вересня в НУБіП України</h1>
+                                <p>ректор Станіслав Ніколаєнко вручив ключ знань першокурсникам!</p>
+                                <p><a class="btn btn-lg btn-link" href="#" role="button"></a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a class="left carousel-control" href="#thumbnail-preview-indicators" role="button"
+                   data-slide="prev"><span
+                        class="glyphicon glyphicon-chevron-left"></span></a>
+                <a class="right carousel-control" href="#thumbnail-preview-indicators" role="button"
+                   data-slide="next"><span
+                        class="glyphicon glyphicon-chevron-right"></span></a>
+            </div>
+        </div>
 
-    </c:if>
-
-
-</div>
-
-        <div class="content">
-        <form>
-            <b><p id="block_name" align="center" ><spring:message code="block_1"/></p></b>
-            <table id="myTable" align="center" class="main-table" border="10">
-
-                <tr>
-                    <th colspan="4"><spring:message code="subblock_1.1"/></th>
-                </tr>
-
-                <tr>
-                    <th><spring:message code="in_order"/></th>
-                    <th><spring:message code="evaluation_criterion"/></th>
-                    <th><spring:message code="number_of_points"/></th>
-                    <th><spring:message code="answer"/></th>
-                </tr>
-                <tr><td class="column">1</td><td name="name"><spring:message code="paragraph_1_1_1"/></td><td>10,00</td> <td> <input type="checkbox" unchecked name="score" value="10.00"> </td> </tr>
-                <tr><td class="column">2</td><td><spring:message code="paragraph_1_1_2"/></td><td>9,00</td> <td><input type="checkbox" unchecked name="paraghaph_1_1_2" value="9.00"></td> </tr>
-                <tr><td class="column">3</td><td><spring:message code="paragraph_1_1_3"/></td><td>8,55</td> <td><input type="checkbox" unchecked name="paraghaph_1_1_3" value="8.55"></td> </tr>
-                <tr><td class="column">4</td><td><spring:message code="paragraph_1_1_4"/></td><td>8,15</td> <td><input type="checkbox" unchecked name="paraghaph_1_1_4" value="8.15"></td> </tr>
-                <tr><td class="column">5</td><td><spring:message code="paragraph_1_1_5"/></td><td>7,20</td> <td><input type="checkbox" unchecked name="paraghaph_1_1_5" value="7.20"></td> </tr>
-                <tr><td class="column">6</td><td><spring:message code="paragraph_1_1_6"/></td><td>6,25</td> <td><input type="checkbox" unchecked name="paraghaph_1_1_6" value="6.25"></td> </tr>
-                <tr><td class="column">7</td><td><spring:message code="paragraph_1_1_7"/></td><td>5,80</td> <td><input type="checkbox" unchecked name="paraghaph_1_1_7" value="5.80"></td></tr>
-                <tr><td class="column">8</td><td><spring:message code="paragraph_1_1_8"/></td><td>5,55</td> <td><input type="checkbox" unchecked name="paraghaph_1_1_8" value="5.55"></td></tr>
-                <tr><td class="column">9</td><td><spring:message code="paragraph_1_1_9"/></td><td>4,50</td> <td><input type="checkbox" unchecked name="paraghaph_1_1_9" value="4.5"></td></tr>
-                <tr><td class="column">10</td><td><spring:message code="paragraph_1_1_10"/></td><td>4,25</td> <td><input type="checkbox" unchecked name="1.1.10" value="4.25"></td></tr>
-                <tr><td class="column">11</td><td><spring:message code="paragraph_1_1_11"/></td><td>3,55</td> <td><input type="checkbox" unchecked name="paraghaph_1_1_1" value="3.55"></td></tr>
-                <tr><td class="column">12</td><td><spring:message code="paragraph_1_1_12"/></td><td>2,55</td> <td> <input type="checkbox" unchecked name="paraghaph_1_1_12" value="2.55"> </tr>
-                <tr><td class="column">13</td><td><spring:message code="paragraph_1_1_13"/></td><td>0,25</td> <td><input type="text" pattern="\d [0-9]" name="paraghaph_1_1_13"></td></tr>
-                <tr><td class="column">14</td><td><spring:message code="paragraph_1_1_14"/></td><td>0,15</td> <td><input type="text" name="paraghaph_1_1_14"></td></tr>
-                <tr><td class="column">15</td><td><spring:message code="paragraph_1_1_15"/></td><td>-1,00</td> <td><input type="text" name="paraghaph_1_1_15" value="-1.00"></td></tr>
-
-
-
-
-                <tr>
-                    <th colspan="4"><spring:message code="subblock_1.2"/> </th>
-                </tr>
-
-                <tr><td class="column">1</td><td><spring:message code="paragraph_1_2_1"/></td><td>7,00</td> <td> <input type="checkbox" unchecked name="paragraph_1_2_1" value="7.00"></td> </tr>
-                <tr><td class="column">2</td><td><spring:message code="paragraph_1_2_2"/></td><td>6,00</td><td> <input type="checkbox" unchecked value="6.00"></td></tr>
-                <tr><td class="column">3</td><td><spring:message code="paragraph_1_2_3"/></td><td>4,80</td> <td> <input type="checkbox" unchecked value="4.80"></td> </tr>
-                <tr><td class="column">4</td><td><spring:message code="paragraph_1_2_4"/></td><td>4,00</td> <td> <input type="checkbox" unchecked value="4.00"> </td> </tr>
-                <tr><td class="column">5</td><td><spring:message code="paragraph_1_2_5"/></td><td>3,00</td> <td> <input type="checkbox" unchecked value="3.00"> </td> </tr>
-                <tr><td class="column">6</td><td><spring:message code="paragraph_1_2_6"/></td><td>1,10</td> <td> <input type="checkbox" unchecked value="1.10"> </td> </tr>
-                <tr><td class="column">7</td><td><spring:message code="paragraph_1_2_7"/></td><td>1,10</td> <td> <input type="checkbox" unchecked value="1.10"></td></tr>
-                <tr><td class="column">8</td><td><spring:message code="paragraph_1_2_8"/></td><td>1,00</td> <td> <input type="checkbox" unchecked value="1.00"> </td></tr>
-                <tr><td class="column">9</td><td><spring:message code="paragraph_1_2_9"/></td><td>0,15</td> <td><input type="text"></td></tr>
-
-
-                <tr>
-                    <th colspan="4"><spring:message code="subblock_1.3"/> </th>
-                </tr>
-
-                </tr>
-                <tr><td class="column">1</td><td><spring:message code="paragraph_1_3_1"/></td><td>6,00</td> <td> <input type="checkbox" unchecked value="6.00"></td> </tr>
-                <tr><td class="column">2</td><td><spring:message code="paragraph_1_3_2"/></td><td>5,00</td> <td> <input type="checkbox" unchecked value="5.00"> </td> </tr>
-                <tr><td class="column">3</td><td><spring:message code="paragraph_1_3_3"/></td><td>4,40</td> <td> <input type="checkbox" unchecked value="4.40"> </td> </tr>
-                <tr><td class="column">4</td><td><spring:message code="paragraph_1_3_4"/></td><td>4,00</td> <td> <input type="checkbox" unchecked value="4.00"></td> </tr>
-                <tr><td class="column">5</td><td><spring:message code="paragraph_1_3_5"/></td><td>1,00</td> <td>  <input type="checkbox" unchecked value="1.00"> </td> </tr>
-                <tr><td class="column">6</td><td><spring:message code="paragraph_1_3_6"/></td><td>0,15</td> <td><input type="text"></td> </tr>
-
-
-                <tr>
-                    <th colspan="4"><spring:message code="subblock_1.4"/> </th>
-                </tr>
-
-                <tr><td class="column">1</td><td><spring:message code="paragraph_1_4_1"/></td><td>4,25</td> <td> <input type="checkbox" unchecked value="4.25">  </td> </tr>
-                <tr><td class="column">2</td><td><spring:message code="paragraph_1_4_2"/></td><td>3,50</td> <td>  <input type="checkbox" unchecked value="3.50">  </td> </tr>
-                <tr><td class="column">3</td><td><spring:message code="paragraph_1_4_3"/></td><td>2,75</td> <td> <input type="checkbox" unchecked value="2.75"> </td> </tr>
-                <tr><td class="column">4</td><td><spring:message code="paragraph_1_4_4"/></td><td>2,30</td> <td> <input type="checkbox" unchecked value="2.30">  </td> </tr>
-                <tr><td class="column">5</td><td><spring:message code="paragraph_1_4_5"/></td><td>0,25</td> <td><input type="text" value="0.25"></td> </tr>
-                <tr><td class="column">6</td><td><spring:message code="paragraph_1_4_6"/></td><td>0,20</td> <td><input type="text" value="0.20"></td> </tr>
-                <tr><td class="column">7</td><td><spring:message code="paragraph_1_4_7"/></td><td>0,20</td> <td><input type="text" value="0.20"></td> </tr>
-                <tr><td class="column">8</td><td><spring:message code="paragraph_1_4_8"/></td><td>0,15</td> <td> <input type="text" value="0.15"></td> </tr>
-                <tr><td class="column">9</td><td><spring:message code="paragraph_1_4_9"/></td><td>-10,00</td> <td> <input type="checkbox" unchecked value="-10.00">  </td> </tr>
-                <tr><td class="column">10</td><td><spring:message code="paragraph_1_4_10"/></td><td>-5,00</td> <td> <input type="checkbox" unchecked value="-5.00"> </td> </tr>
-
-            </table>
-            <input align="center" type="submit" onclick="getData1()">
-        </form>
     </div>
 
-    <b><p><spring:message code="tooltip"/> </p></b>
-
 </div>
-<script src="/pages/js/app.js"></script>
+<footer class="page-footer font-small blue-grey lighten-5">
+    <div class="footer-copyright text-center text-black-50 py-2">
+        <p>&copy; Tarasii 2018 «НУБІП УКРАЇНИ»</p>
+        <p class="font_8">Наші соц мережі</p>
+        <div class="social">
+            <ul>
+                <li>
+                    <a href="https://www.facebook.com/nubip.edu.ua/?ref=br_rs" target="_blank"
+                       data-content="https://www.facebook.com/nubip.edu.ua/?ref=br_rs" data-type="external"
+                       rel="nofollow" id="LnkBr00imagelink" class="lb1imageItemlink">
+                        <img id="LnkBr00imageimageimage" class="link" src="https://static.wixstatic.com/media/ed86bdfa6aecf88649d305e11d76ac33.wix_mp/v1/fill/w_23,h_23,al_c,usm_0.66_1.00_0.01/ed86bdfa6aecf88649d305e11d76ac33.wix_mp"></a>
+                </li>
+                <li>
+                    <a href="https://www.youtube.com/channel/UC-U1fqRT0jeRLUUDcMq1uaw" target="_blank"
+                       data-content="https://www.youtube.com/channel/UC-U1fqRT0jeRLUUDcMq1uaw" data-type="external"
+                       rel="nofollow" id="LnkBr01imagelink" class="lb1imageItemlink">
+                        <img id="LnkBr01imageimageimage" class="link" src="https://static.wixstatic.com/media/45bce1d726f64f1999c49feae57f6298.png/v1/fill/w_23,h_23,al_c,usm_0.66_1.00_0.01/45bce1d726f64f1999c49feae57f6298.png"></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</footer>
+</div>
 </body>
 </html>

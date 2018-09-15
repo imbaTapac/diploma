@@ -1,6 +1,8 @@
 package student_rating.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,35 +14,31 @@ import java.util.List;
  */
 @Entity
 @Table(name = "block")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Long.class)
 public class Block implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_block")
+    private long id;
 
-    @Column
-    private long id_block;
-
-    @Column
+    @Column(columnDefinition = "NVARCHAR(128)")
     private String name;
 
+    @JsonManagedReference(value = "block")
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "id_block")
     private List<Subblock> subblock = new ArrayList<>();
 
-
     public Block() {
-
     }
 
-    public long getId_block() {
-        return id_block;
+    public long getId() {
+        return id;
     }
 
-    public void setId_block(long id_block) {
-        this.id_block = id_block;
-    }
 
-    public Block(String name) {
-        this.name = name;
+    public void setId(long id) {
+        this.id = id;
     }
 
 
@@ -52,6 +50,7 @@ public class Block implements Serializable{
     public void setName(String name) {
         this.name = name;
     }
+
 
     public List<Subblock> getSubblock() {
         return subblock;

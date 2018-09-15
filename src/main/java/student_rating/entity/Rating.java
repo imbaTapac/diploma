@@ -1,38 +1,87 @@
 package student_rating.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import javax.persistence.*;
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Тарас on 05.03.2018.
  */
 @Entity
 @Table(name = "rating")
-public class Rating {
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Long.class)
+public class Rating implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
-    private long id_rating;
+    @Column(name = "id_rating")
+    private Long id;
 
     @Column
-    String score;
+    private Double score;
 
-    @Column
-    boolean ischecked;
+    @Column(columnDefinition = "INTEGER(1)",name = "stage_of_approve")
+    private int stageOfApprove;
+
+    @Column(columnDefinition = "VARCHAR(256)")
+    private String comment;
 
     @Temporal(TemporalType.DATE)
     @Column
-    Date date;
+    private Date date;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+
+    @ManyToOne
     @JoinColumn(name = "id_student")
     public Student student;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+
+    @ManyToOne
     @JoinColumn(name = "id_paragraph")
     public Paragraph paragraph;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Double getScore() {
+        return score;
+    }
+
+    public void setScore(Double score) {
+        this.score = score;
+    }
+
+    public int getStageOfApprove() {
+        return stageOfApprove;
+    }
+
+    public void setStageOfApprove(int stageOfApprove) {
+        this.stageOfApprove = stageOfApprove;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
 
     public Student getStudent() {
         return student;
@@ -50,35 +99,16 @@ public class Rating {
         this.paragraph = paragraph;
     }
 
-    public long getId_rating() {
-        return id_rating;
-    }
-
-    public void setId_rating(long id_rating) {
-        this.id_rating = id_rating;
-    }
-
-    public String getScore() {
-        return score;
-    }
-
-    public void setScore(String score) {
-        this.score = score;
-    }
-
-    public boolean ischecked() {
-        return ischecked;
-    }
-
-    public void setIschecked(boolean ischecked) {
-        this.ischecked = ischecked;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
+    @Override
+    public String toString() {
+        return "Rating{" +
+                "id=" + id +
+                ", score=" + score +
+                ", stageOfApprove=" + stageOfApprove +
+                ", comment='" + comment + '\'' +
+                ", date=" + date +
+                ", student=" + student +
+                ", paragraph=" + paragraph +
+                '}';
     }
 }
