@@ -39,4 +39,13 @@ public class RatingDTO implements Serializable{
     public void setComent(String comment) {
         this.comment = comment;
     }
+
+	@Override
+	public String toString() {
+		return "RatingDTO{" +
+				"paragraphId=" + paragraphId +
+				", score=" + score +
+				", comment='" + comment + '\'' +
+				'}';
+	}
 }

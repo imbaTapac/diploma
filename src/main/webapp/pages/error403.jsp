@@ -25,7 +25,8 @@
         <p><span><label>Упс...</label></span>${msg}</p>
         <a href="/welcome">На головну</a>
         <div class="copy-right">
-            <p>&copy; 2018. All Rights Reserved | Design by Tarasii</p>
+            <p>Desing by Tarasii and smav.com.ua</p>
+            <p>&copy; 2018-2019. All Rights Reserved</p>
         </div>
     </div>
     <!--End-Cotent------>

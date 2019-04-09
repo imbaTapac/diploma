@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Тарас on 03.04.2018.
@@ -16,9 +18,9 @@ public class Specialty implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_specialty")
-    private long id;
+    private Long id;
 
-    @Column(columnDefinition = "NVARCHAR(28)")
+    @Column(columnDefinition = "NVARCHAR(64)")
     private String name;
 
     @Column(columnDefinition = "NVARCHAR(28)")
@@ -28,11 +30,15 @@ public class Specialty implements Serializable {
     @JoinColumn(name="id_faculty")
     private Faculty faculty;
 
-    public long getId() {
+    @OneToMany
+    @JoinColumn(name = "id_specialty")
+    private List<Student> students = new ArrayList<>();
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -59,5 +65,23 @@ public class Specialty implements Serializable {
     public void setFaculty(Faculty faculty) {
         this.faculty = faculty;
     }
+
+	public List<Student> getStudents() {
+		return students;
+	}
+
+	public void setStudents(List<Student> students) {
+		this.students = students;
+	}
+
+	@Override
+	public String toString() {
+		return "Specialty{" +
+				"id=" + id +
+				", name='" + name + '\'' +
+				", code='" + code + '\'' +
+				", faculty=" + faculty +
+				'}';
+	}
 }
 

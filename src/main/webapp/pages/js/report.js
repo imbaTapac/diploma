@@ -8,7 +8,9 @@ $(document).ready(function () {
             mimeType: 'application/json',
             async: false,
             success: function (data) {
-                $('#example1').DataTable({
+                tableHandler();
+                $('#report-by-group').DataTable({
+                    destroy:true,
                     data: data,
                     dom: 'Bfrtip',
                     buttons: [
@@ -63,7 +65,9 @@ $(document).ready(function () {
             mimeType: 'application/json',
             async: false,
             success: function (data) {
-                $('#example2').DataTable({
+                tableHandler();
+                $('#overall-report-by-group').DataTable({
+                    destroy:true,
                     data: data,
                     dom: 'Bfrtip',
                     buttons: [
@@ -115,3 +119,14 @@ $(document).ready(function () {
 
 });
 
+
+function tableHandler() {
+    var report1 = document.getElementById('by-group');
+    var report2 = document.getElementById('overall-by-group');
+    if(report1.style.display === 'block'){
+        report1.style.display = 'none';
+    }
+    if(report2.style.display === 'block'){
+        report2.style.display = 'none';
+    }
+}

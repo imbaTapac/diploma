@@ -83,7 +83,7 @@
                             </h1>
 
                             <div>
-                                <c:set var="index" value="${0}"/>
+                                <c:set var="index" value="${1}"/>
                                 <table id="myTable" align="center" class="table text-center">
                                     <thead class="text-center">
                                     <tr id="block_header">
@@ -97,7 +97,7 @@
                                     <c:forEach items="${subblock.paragraph}" var="paragraph"> <!--Parapgraph-->
                                         <tbody id="tBody">
                                         <tr>
-                                            <td class="column"><c:out value="${index+1}"/></td>
+                                            <td class="column"><c:out value="${index}"/></td>
                                             <td><c:out value="${paragraph.name}"/></td>
                                             <td><c:out value="${paragraph.score}"/></td>
                                             <c:choose>

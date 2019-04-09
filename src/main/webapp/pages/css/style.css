@@ -85,6 +85,10 @@ a{
 .img_nubip{
     margin-left: 5%;
 }
+.img_nubip-footer{
+    margin-left: 5%;
+    padding-top: 20px;
+}
 
 .confirm_password {
     max-width: 25px;
@@ -431,4 +435,10 @@ a:active {
 
 #clockdiv{
     text-align: center;
+}
+
+.tooltip-inner {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #000;
 }

@@ -43,13 +43,14 @@ public class RatingServiceImpl implements RatingService {
     public List<Rating> save(List<RatingDTO> ratingDTO) {
         List<Rating> ratings = new ArrayList<>();
         String studentName = SecurityContextHolder.getContext().getAuthentication().getName();
-        LOG.debug("Student with name {} trying to save rating",studentName);
-        Student student = studentRepository.findByUsername(studentName);
-        DateTime currentDate = new DateTime();
-        DateTime monthStart = currentDate.dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
-        DateTime monthEnd = currentDate.dayOfMonth().withMaximumValue().withTimeAtStartOfDay();
-        List<Rating> currentMonthRatings = ratingRepository.findAllRatingsByDateBetween(monthStart.toDate(), monthEnd.toDate());
-        //TODO : in ver_0.8 clarify message what ratings is duplicated
+	    LOG.debug("Student {} trying to save rating", studentName);
+	    Student student = studentRepository.findByUsername(studentName);
+	    DateTime currentDate = new DateTime();
+	    DateTime monthStart = currentDate.dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
+	    DateTime monthEnd = currentDate.dayOfMonth().withMaximumValue().withTimeAtStartOfDay();
+	    List<Rating> currentMonthRatings = ratingRepository.findAllRatingsByStudentIdAndDateBetween(student.getId(),monthStart.toDate(), monthEnd.toDate());
+	    LOG.debug("Ratings that student have {}.\n Ratings that student want to save {}",currentMonthRatings,ratingDTO);
+        //TODO : in ver_0.9 clarify message what ratings is duplicated
         boolean isDuplicated = currentMonthRatings.stream()
                 .map(r -> r.getParagraph().getId())
                 .anyMatch(id -> ratingDTO.stream()
@@ -64,12 +65,12 @@ public class RatingServiceImpl implements RatingService {
             rating.setStageOfApprove(0);
             rating.setScore(studentRating.getScore());
             rating.setComment(studentRating.getComment());
-            Paragraph paragraph = paragraphRepository.findById(studentRating.getParagraphId());
+            Paragraph paragraph = paragraphRepository.findById(studentRating.getParagraphId()).get();
             rating.setParagraph(paragraph);
             rating.setStudent(student);
             ratings.add(rating);
         }
-        return ratingRepository.save(ratings);
+        return ratingRepository.saveAll(ratings);
     }
 
     @Override
@@ -108,6 +109,6 @@ public class RatingServiceImpl implements RatingService {
             rating.setStageOfApprove(rating.getStageOfApprove() + 1);
         }
 
-        return ratingRepository.save(ratings);
+        return ratingRepository.saveAll(ratings);
     }
 }

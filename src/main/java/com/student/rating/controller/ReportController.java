@@ -21,7 +21,7 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    private static final String APPLICATION_EXCEL = "application/vnd.ms-excel";
+    private static final String APPLICATION_EXCEL = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
     @Autowired
     public ReportController(ReportService reportService) {

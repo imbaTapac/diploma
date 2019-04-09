@@ -5,8 +5,6 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
-<!-- //TODO: when to the user shows the report and then he clicks to another, the previous must be hidden and his data must be dropped. -->
-
 <html>
 <head>
     <meta charset="utf-8">
@@ -99,9 +97,9 @@
 
                 <a id="statreport1-anchor"></a>
                 <div class="form-group">
-                    <div class="statreport1-dropdown animate fadeInUpBig" align="center" #statreport1>
+                    <div class="statreport1-dropdown animate fadeInUpBig" align="center" id="by-group" #statreport1>
                         <b><p id="block_name" align="center" >По групах (загальний)</p></b>
-                        <table id="example1" class="table table-striped table-bordered" border="10"  width="60%">
+                        <table id="report-by-group" class="table table-striped table-bordered" border="10"  width="60%">
                             <thead>
                             <tr id="columns">
                                 <th>№ <br>П/П</th>
@@ -115,9 +113,9 @@
 
                 <a id="statreport2-anchor"></a>
                 <div class="form-group">
-                    <div class="statreport2-dropdown animate fadeInUpBig" align="center" #statreport2>
-                        <b><p id="block_name" align="center" >По групах (загальний)</p></b>
-                        <table id="example2" class="table table-striped table-bordered" border="10"  width="60%">
+                    <div class="statreport2-dropdown animate fadeInUpBig" align="center" id="overall-by-group" #statreport2>
+                        <b><p id="block_name" align="center" >По групах (детальний)</p></b>
+                        <table id="overall-report-by-group" class="table table-striped table-bordered" border="10" width="60%">
                             <thead>
                             <tr id="columns">
                                 <th>№ <br>П/П</th>

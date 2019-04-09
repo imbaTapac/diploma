@@ -27,5 +27,12 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
     List<Rating> findAllRatingsByIdStudentAndStageOfApproveGreaterThan(@Param("studentId") Long studentId, @Param("stageOfApprove") Integer stageOfApprove,
                                                                        @Param("startMonth") Date startMonth, @Param("endMonth") Date endMonth);
 
-    List<Rating> findAllRatingsByDateBetween(Date startMonth,Date endMonth);
+	/**
+	 * Retrieves student rating in scope month.
+	 * @param id
+	 * @param startMonth
+	 * @param endMonth
+	 * @return
+	 */
+	List<Rating> findAllRatingsByStudentIdAndDateBetween(Long id,Date startMonth,Date endMonth);
 }

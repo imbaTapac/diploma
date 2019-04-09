@@ -6,12 +6,16 @@
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 <c:set var="groups" value="${requestScope.groups}"/>
+<c:set var="specialties" value="${requestScope.specialties}"/>
+
 <c:url value="/save-user" var="finishRegisterUrl"/>
 
 <spring:message htmlEscape="false" code="course" var="course"/>
 <spring:message htmlEscape="false" code="phone" var="phone"/>
 <spring:message htmlEscape="false" code="password" var="password"/>
 <spring:message htmlEscape="false" code="confirm_password" var="confrimPassword"/>
+<spring:message htmlEscape="false" code="promocode" var="promoCode"/>
+<spring:message htmlEscape="false" code="promo_code_tooltip" var="promoCodeTooltip"/>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -57,11 +61,24 @@
                                 </div>
                             </spring:bind>
 
+                            <spring:bind path="specialtyName">
+                                <div class="form-group inner-addon left-addon ${status.error ? 'has-error' : ''}">
+                                    <i class="glyphicon"><img class="img_nubip png" src="${contextPath}/pages/img/specialty.png"/></i>
+                                    <form:select path="specialtyName" title="Спеціальність" class="form-control group-name" items="${specialties}"/>
+                                </div>
+                            </spring:bind>
+
                             <spring:bind path="groupName">
                                 <div class="form-group inner-addon left-addon ${status.error ? 'has-error' : ''}">
-                                    <i class="glyphicon"><img class="img_nubip png" src="${contextPath}/pages/img/email.png"/></i>
-                                    <form:select path="groupName" class="form-control group-name" items="${groups}"/>
-                                    <%--<form:errors path="group"/>--%>
+                                    <i class="glyphicon"><img class="img_nubip png" src="${contextPath}/pages/img/groups.png"/></i>
+                                    <form:select path="groupName" title="Група" class="form-control group-name" items="${groups}"/>
+                                </div>
+                            </spring:bind>
+
+                            <spring:bind path="promoCode">
+                                <div class="form-group inner-addon left-addon ${status.error ? 'has-error' : ''}">
+                                    <i class="glyphicon"><img class="img_nubip png" src="${contextPath}/pages/img/promocode.png"/></i>
+                                    <form:input type="text" path="promoCode" title="${promoCodeTooltip}" class="form-control" placeholder="${promoCode}"/>
                                 </div>
                             </spring:bind>
 
@@ -94,21 +111,18 @@
         <div id="footer-index">
             <div class="row">
                 <div class="col-md">
-                    <img class="img_nubip" src="${contextPath}/pages/img/nubip_bottom_logo_ua.png"/>
+                    <img class="img_nubip-footer" src="${contextPath}/pages/img/nubip_bottom_logo_ua.png">
                 </div>
                 <div class="col-md-6">
                     <div class="mx-auto  text-center">
                         <a class="btn soc soc-y" href="https://www.youtube.com/"></a>
                         <a class="btn soc soc-f" href="https://www.facebook.com/"></a>
                         <a class="btn soc soc-i" href="https://www.instagram.com/"></a>
+                        <span><br>Desing by smav.com.ua. Develop by Tarasii</span>
+                        <span><br>© 2018-2019. All Rights Reserved</span>
                     </div>
                 </div>
-                <div class="col-md">
-                    <p class="text-right pdeveloper">
-                        Website developed:
-                        <a href="http://smav.com.ua/">smav.com.ua</a>
-                    </p>
-                </div>
+                <div class="col-md"></div>
             </div>
         </div>
     </div>

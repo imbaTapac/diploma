@@ -17,12 +17,12 @@ public class Faculty implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_faculty")
-    private long id;
+    private Long id;
 
     @Column(columnDefinition ="NVARCHAR(32)")
     private String name;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany
     @JoinColumn(name="id_faculty")
     private List<Specialty> specialty;
 
@@ -30,11 +30,11 @@ public class Faculty implements Serializable {
     @JoinColumn(name="id_faculty")
     private List<Group> group;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

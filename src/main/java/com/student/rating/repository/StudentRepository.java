@@ -9,6 +9,7 @@ import com.student.rating.entity.Student;
 import javax.persistence.PersistenceContext;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by Тарас on 31.05.2018.
@@ -28,7 +29,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
      * @param id
      * @return
      */
-    Student findById(Long id);
+    Optional<Student> findById(Long id);
 
     /**
      *

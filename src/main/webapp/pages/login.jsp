@@ -51,21 +51,18 @@
             <div id="footer-index">
                 <div class="row">
                     <div class="col-md">
-                        <img class="img_nubip" src="${contextPath}/pages/img/nubip_bottom_logo_ua.png"/>
+                        <img class="img_nubip-footer" src="${contextPath}/pages/img/nubip_bottom_logo_ua.png">
                     </div>
                     <div class="col-md-6">
                         <div class="mx-auto  text-center">
                             <a class="btn soc soc-y" href="https://www.youtube.com/"></a>
                             <a class="btn soc soc-f" href="https://www.facebook.com/"></a>
                             <a class="btn soc soc-i" href="https://www.instagram.com/"></a>
+                            <span><br>Desing by smav.com.ua. Develop by Tarasii</span>
+                            <span><br>© 2018-2019. All Rights Reserved</span>
                         </div>
                     </div>
-                    <div class="col-md">
-                        <p class="text-right pdeveloper">
-                            Website developed:
-                            <a href="http://smav.com.ua/">smav.com.ua</a>
-                        </p>
-                    </div>
+                    <div class="col-md"></div>
                 </div>
             </div>
         </div>

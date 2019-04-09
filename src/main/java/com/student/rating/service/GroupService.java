@@ -6,6 +6,5 @@ import java.util.List;
 
 public interface GroupService {
     List<Group> groupList();
-    List<String> getAllFacultyGroupNamesByFacultyName(String facultyName);
-    Group findGroupByName(String groupName);
+    List<String> getAllFacultyGroupNamesByFacultyName();
 }

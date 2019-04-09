@@ -3,6 +3,8 @@ package com.student.rating.utility;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
 import com.student.rating.entity.*;
 import com.student.rating.repository.*;
 
@@ -12,7 +14,7 @@ import java.util.List;
 /**
  * Created by Тарас
  */
-
+@Component
 public final class StaticDataEngine {
     private static final Logger LOG = LoggerFactory.getLogger(StaticDataEngine.class);
 
@@ -23,21 +25,21 @@ public final class StaticDataEngine {
     public static List<Block> BLOCK_LIST;
     public static List<Student> STUDENT_LIST;
 
-    public static List<String> GROUP_NAME_LIST = new ArrayList<>();
-
     private final BlockRepository blockRepository;
     private final FacultyRepository facultyRepository;
     private final GroupRepository groupRepository;
     private final StudentRepository studentRepository;
     private final OKRRepository okrRepository;
+    private final SpecialtyRepository specialtyRepository;
 
     private StaticDataEngine(BlockRepository blockRep,GroupRepository groupRep,FacultyRepository facultyRep,
-                             StudentRepository studentRep,OKRRepository okrRep) {
+                             StudentRepository studentRep,OKRRepository okrRep,SpecialtyRepository specialtyRep) {
         this.blockRepository = blockRep;
         this.facultyRepository = facultyRep;
         this.groupRepository = groupRep;
         this.studentRepository = studentRep;
         this.okrRepository = okrRep;
+        this.specialtyRepository = specialtyRep;
 
         int subblockCount = 0;
         int paragraphCount = 0;
@@ -49,11 +51,9 @@ public final class StaticDataEngine {
         FACULTY_LIST = facultyRepository.findAll();
         STUDENT_LIST = studentRepository.findAll();
         OKR_LIST = okrRepository.findAll();
-        long time = DateTime.now().getMillis() - start;
+        SPECIALTY_LIST = specialtyRepository.findAll();
 
-        for(Group group : GROUP_LIST){
-            GROUP_NAME_LIST.add(group.getName());
-        }
+        long time = DateTime.now().getMillis() - start;
 
         LOG.info("Loaded {} blocks",BLOCK_LIST.size());
         for(Block block: BLOCK_LIST){
@@ -66,6 +66,7 @@ public final class StaticDataEngine {
         LOG.info("Loaded {} paragraphs",paragraphCount);
         LOG.info("Loaded {} groups",GROUP_LIST.size());
         LOG.info("Loaded {} faculties",FACULTY_LIST.size());
+        LOG.info("Loaded {} specialties",SPECIALTY_LIST.size());
         LOG.info("Loaded {} students",STUDENT_LIST.size());
         LOG.info("Loaded {} okrs",OKR_LIST.size());
 

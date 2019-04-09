@@ -28,6 +28,7 @@ $(document).ready(function () {
             type: 'POST',
             dataType: 'json',
             contentType: 'application/json',
+            mimeType: 'application/json',
             data: JSON.stringify(this.value),
             success: function (response) {
                 console.log(response);

@@ -114,7 +114,7 @@
                                     Спеціальність
                                 </div>
                                 <div class="col-6 text_user_item2">
-                                    <c:out value="${student.group.faculty.specialty[0].name}"/>
+                                    <c:out value="${student.specialty.name}"/>
                                 </div>
                             </div>
                             <div class="row">

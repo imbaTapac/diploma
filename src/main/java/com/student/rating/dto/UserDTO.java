@@ -8,8 +8,12 @@ public class UserDTO implements Serializable {
 
     @JsonProperty("course")
     private String course;
+	@JsonProperty("specialtyName")
+	private String specialtyName;
     @JsonProperty("groupName")
     private String groupName;
+    @JsonProperty("promoCode")
+    private String promoCode = "";
     @JsonProperty("phone")
     private String phone;
     @JsonProperty("password")
@@ -25,7 +29,23 @@ public class UserDTO implements Serializable {
         this.course = course;
     }
 
-    public String getGroupName() {
+	public String getSpecialtyName() {
+		return specialtyName;
+	}
+
+	public void setSpecialtyName(String specialtyName) {
+		this.specialtyName = specialtyName;
+	}
+
+	public String getPromoCode() {
+		return promoCode;
+	}
+
+	public void setPromoCode(String promoCode) {
+		this.promoCode = promoCode;
+	}
+
+	public String getGroupName() {
         return groupName;
     }
 
@@ -57,13 +77,16 @@ public class UserDTO implements Serializable {
         this.confirmPassword = confirmPassword;
     }
 
-    @Override
-    public String toString() {
-        return "UserDTO{" +
-                "groupName='" + groupName + '\'' +
-                ", phone='" + phone + '\'' +
-                ", password='" + password + '\'' +
-                ", confirmPassword='" + confirmPassword + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "UserDTO{" +
+				"course='" + course + '\'' +
+				", specialtyName='" + specialtyName + '\'' +
+				", groupName='" + groupName + '\'' +
+				", promoCode='" + promoCode + '\'' +
+				", phone='" + phone + '\'' +
+				", password='" + password + '\'' +
+				", confirmPassword='" + confirmPassword + '\'' +
+				'}';
+	}
 }
