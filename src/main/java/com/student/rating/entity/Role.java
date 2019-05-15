@@ -4,20 +4,23 @@ import org.springframework.security.core.GrantedAuthority;
 
 public enum Role implements GrantedAuthority {
 
-    STUDENT("STUDENT"),
-    HEAD_OF_GROUP("HEAD_OF_GROUP"),
-    HEAD_OF_SO("HEAD_OF_SO"),
-    ADMINISTRATOR("ADMINISTRATOR");
+	STUDENT("STUDENT"),
+	HEAD_OF_GROUP("HEAD_OF_GROUP"),
+	HEAD_OF_SO("HEAD_OF_SO"),
+	ADMINISTRATOR("ADMINISTRATOR");
 
-    private final String authority;
+	private final String authority;
 
-    Role(String roleName) {
-        this.authority = roleName;
-    }
+	Role(String roleName) {
+		this.authority = roleName;
+	}
 
+	@Override
+	public String getAuthority() {
+		return "ROLE_" + this.authority;
+	}
 
-    @Override
-    public String getAuthority() {
-        return "ROLE_" + this.authority;
-    }
+	public String getFullAuthority() {
+		return "[ROLE_" + this.authority + "]";
+	}
 }

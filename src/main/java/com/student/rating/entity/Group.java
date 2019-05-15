@@ -5,6 +5,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 /**
  * Created by Тарас on 17.04.2018.
  */
@@ -20,6 +23,7 @@ public class Group implements Serializable {
     private String name;
 
     @OneToMany(mappedBy = "group" , cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Student> students = new ArrayList<>();
 
     @ManyToOne

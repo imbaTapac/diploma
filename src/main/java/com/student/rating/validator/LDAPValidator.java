@@ -33,7 +33,7 @@ public class LDAPValidator implements Validator {
             return;
         }
 
-        if (ldapUserDTO.getLogin().length() <= 4 || ldapUserDTO.getLogin().length() > 20) {
+        if (ldapUserDTO.getLogin().length() <= 4 || ldapUserDTO.getLogin().length() > 36) {
             errors.rejectValue("login", "InvalidUsernameSize");
         }
 

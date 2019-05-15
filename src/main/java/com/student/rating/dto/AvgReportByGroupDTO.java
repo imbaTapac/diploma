@@ -15,7 +15,7 @@ public class AvgReportByGroupDTO implements Serializable {
     @JsonProperty("groupName")
     private String groupName;
     @JsonProperty("score")
-    private Double score;
+    private Double score = 0.0;
 
     public Integer getNumber() {
         return number;

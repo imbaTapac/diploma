@@ -26,6 +26,8 @@ public class OverallReportByGroupDTO implements Serializable {
     private String paragraphName;
     @JsonProperty("score")
     private Double score;
+    @JsonProperty("comment")
+    private String comment = "";
 
     public Long getIdStudent() {
         return idStudent;
@@ -91,6 +93,14 @@ public class OverallReportByGroupDTO implements Serializable {
         this.score = score;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     @Override
     public String toString() {
         return "OverallReportByGroupDTO{" +
@@ -102,6 +112,7 @@ public class OverallReportByGroupDTO implements Serializable {
                 ", subblockName='" + subblockName + '\'' +
                 ", paragraphName='" + paragraphName + '\'' +
                 ", score=" + score +
+                ", comment='" + comment + '\'' +
                 '}';
     }
 }

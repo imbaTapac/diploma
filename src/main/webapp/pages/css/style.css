@@ -153,6 +153,15 @@ a{
 .nav-left{
     padding: 0 2% 2% 0;
 }
+
+.criteria {
+    width: 55%;
+}
+
+.header {
+    font-size: 36px;
+}
+
 .nav-left>li{
     padding: 4px;
     margin-top: 5px;
@@ -441,4 +450,106 @@ a:active {
     background-color: #fff;
     color: #000;
     border: 1px solid #000;
+}
+
+#month-pick {
+    display: block;
+    font: 1rem 'Fira Sans', sans-serif;
+}
+
+#month-picker, #month-pick {
+    margin: .4rem 0;
+}
+
+.note {
+    font-size: .8em;
+}
+
+.custom-month-picker {
+    margin-right: 10px;
+}
+
+#month-pick {
+    display: block;
+    font: 1rem 'Fira Sans', sans-serif;
+}
+
+#month-picker, #month-pick {
+    margin: .4rem 0;
+}
+
+.note {
+    font-size: .8em;
+}
+
+.custom-month-picker {
+    margin-right: 10px;
+}
+
+#month-pick {
+    display: block;
+    font: 1rem 'Fira Sans', sans-serif;
+}
+
+#month-picker, #month-pick {
+    margin: .4rem 0;
+}
+
+.note {
+    font-size: .8em;
+}
+
+.custom-month-picker {
+    margin-right: 10px;
+}
+
+#month-pick {
+    display: block;
+    font: 1rem 'Fira Sans', sans-serif;
+}
+
+#month-picker, #month-pick {
+    margin: .4rem 0;
+}
+
+.note {
+    font-size: .8em;
+}
+
+.custom-month-picker {
+    margin-right: 10px;
+}
+
+#month-pick {
+    display: block;
+    font: 1rem 'Fira Sans', sans-serif;
+}
+
+#month-picker, #month-pick {
+    margin: .4rem 0;
+}
+
+.note {
+    font-size: .8em;
+}
+
+.custom-month-picker {
+    margin-right: 10px;
+}
+
+#month-pick {
+    display: block;
+    font: 1rem 'Fira Sans', sans-serif;
+}
+
+#month-picker, #month-pick {
+    margin: .4rem 0;
+}
+
+.note {
+    font-size: .8em;
+}
+
+.custom-month-picker {
+    margin-right: 10px;
 }

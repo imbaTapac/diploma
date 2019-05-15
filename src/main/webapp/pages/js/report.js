@@ -1,7 +1,7 @@
 $(document).ready(function () {
     $('.anchor1').click(function () {
         $.ajax({
-            url: "/statistic_report1", // json datasource
+            url: "/statistic_report1",
             type: "POST",
             dataType: 'json',
             contentType: 'application/json',
@@ -10,7 +10,7 @@ $(document).ready(function () {
             success: function (data) {
                 tableHandler();
                 $('#report-by-group').DataTable({
-                    destroy:true,
+                    destroy: true,
                     data: data,
                     dom: 'Bfrtip',
                     buttons: [
@@ -50,7 +50,8 @@ $(document).ready(function () {
                 var anchor = document.getElementsByClassName('statreport1-dropdown');
                 anchor[0].style.display = 'block';
             },
-            error: function (data) {
+            error: function (response) {
+                console.log(response);
             }
         });
     });
@@ -58,7 +59,7 @@ $(document).ready(function () {
 
     $('.anchor2').click(function () {
         $.ajax({
-            url: "/statistic_report2", // json datasource
+            url: "/statistic_report2",
             type: "POST",
             dataType: 'json',
             contentType: 'application/json',
@@ -67,7 +68,7 @@ $(document).ready(function () {
             success: function (data) {
                 tableHandler();
                 $('#overall-report-by-group').DataTable({
-                    destroy:true,
+                    destroy: true,
                     data: data,
                     dom: 'Bfrtip',
                     buttons: [
@@ -86,13 +87,14 @@ $(document).ready(function () {
                     ],
                     "columns": [
                         {data: "idStudent"},
-                        {data: "studentName"},
                         {data: "studentSurname"},
+                        {data: "studentName"},
                         {data: "groupName"},
                         {data: "blockName"},
                         {data: "subblockName"},
                         {data: "paragraphName"},
-                        {data: "score"}
+                        {data: "score"},
+                        {data: "comment"}
                     ],
                     "language": {
                         "lengthMenu": "Показати _MENU_ записів на сторінку",
@@ -112,7 +114,8 @@ $(document).ready(function () {
                 var anchor = document.getElementsByClassName('statreport2-dropdown');
                 anchor[0].style.display = 'block';
             },
-            error: function (data) {
+            error: function (response) {
+                console.log(response);
             }
         });
     });
@@ -123,10 +126,10 @@ $(document).ready(function () {
 function tableHandler() {
     var report1 = document.getElementById('by-group');
     var report2 = document.getElementById('overall-by-group');
-    if(report1.style.display === 'block'){
+    if (report1.style.display === 'block') {
         report1.style.display = 'none';
     }
-    if(report2.style.display === 'block'){
+    if (report2.style.display === 'block') {
         report2.style.display = 'none';
     }
 }

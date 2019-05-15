@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.student.rating.dto.ActionRatingDTO;
 import com.student.rating.dto.RatingDTO;
-import com.student.rating.dto.RejectRatingDTO;
 import com.student.rating.dto.ResultRatingDTO;
 import com.student.rating.entity.Rating;
 import com.student.rating.entity.Student;
@@ -86,8 +86,9 @@ public class RatingController {
 
 	@Secured({"ROLE_HEAD_OF_GROUP", "ROLE_HEAD_OF_SO", "ROLE_ADMINISTRATOR"})
 	@PostMapping(value = "/students-rating/accept")
-	public ResponseEntity<Object> accept(@RequestBody Long studentId) {
-		List<Rating> ratings = ratingService.approveRating(studentId);
+	public @ResponseBody
+	ResponseEntity<Object> accept(@RequestBody ActionRatingDTO actionRatingDTO) {
+		List<Rating> ratings = ratingService.approveRating(actionRatingDTO);
 		List<ResultRatingDTO> resultRatingDTO = ratingObjectDTOMapper.toDTOs(ratings);
 		return ResponseEntity.ok(resultRatingDTO);
 	}
@@ -95,8 +96,8 @@ public class RatingController {
 	@Secured({"ROLE_HEAD_OF_GROUP", "ROLE_HEAD_OF_SO", "ROLE_ADMINISTRATOR"})
 	@PostMapping(value = "/students-rating/reject")
 	@ResponseBody
-	public String reject(@RequestBody RejectRatingDTO rejectRatingDTO) {
-		emailService.sendMail(rejectRatingDTO);
+	public String reject(@RequestBody ActionRatingDTO actionRatingDTO) {
+		emailService.sendMail(actionRatingDTO);
 		return "students-rating";
 	}
 }

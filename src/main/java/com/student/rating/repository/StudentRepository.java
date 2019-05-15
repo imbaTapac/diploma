@@ -62,12 +62,13 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     /**
      * Retrieves student with their ratings in month scope month.
-     * For role {@link com.student.rating.entity.Role.HEAD_OF_GROUP,com.student.rating.entity.Role.HEAD_OF_SO}
+     * For role {@link com.student.rating.entity.Role#HEAD_OF_GROUP,com.student.rating.entity.Role#HEAD_OF_SO}
      * @param id
      * @param startMonth
      * @param endMonth
      * @return
      */
+    @Deprecated
     @Query(value = "SELECT DISTINCT s FROM Student s LEFT JOIN FETCH s.ratings r WHERE s.group.id = :id AND (r.student.id = s.id AND r.date BETWEEN :startMonth AND :endMonth OR r IS NULL) ORDER BY s.id")
     List<Student> findAllStudentsInGroupWithRatings(@Param("id") Long id , @Param("startMonth") Date startMonth, @Param("endMonth") Date endMonth);
 }
