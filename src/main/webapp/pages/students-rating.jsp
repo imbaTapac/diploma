@@ -3,7 +3,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
-<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
@@ -11,7 +10,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>Перевірка рейтингу</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -42,6 +41,7 @@
                 <li><a href="/welcome"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item1.png"/><span class="text-uppercase">Головна сторінка</span></a></li>
                 <li><a href="/profile"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item2.png"/><span class="text-uppercase">Профіль</span></a></li>
                 <li><a href="/rating"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item3.png"/><span class="text-uppercase">Заповнити рейтинг</span></a></li>
+                <li><a href="/my-rating"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item7.png"/><span class="text-uppercase">Мій рейтинг</span></a></li>
                 <li><a href="/students"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item6.png"/><span class="text-uppercase">Мої студенти</span></a></li>
                 <li><a href="/check-rating"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item4.png"/><span class="text-uppercase">Перевірити рейтинг</span></a></li>
                 <li><a href="/reports"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item5.png"/><span class="text-uppercase">Звіти</span></a></li>
@@ -53,31 +53,39 @@
                 <c:set var="total" value="${0.0}"/>
                 <c:set var="counter" value="${1}"/>
                 <h1 align="center">Рейтинг студента</h1>
-
-                <table class="table">
+                <table class="table" id="table">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Критерій оцінки</th>
+                            <th class="criteria">Критерій оцінки</th>
                             <th>Дата</th>
                             <th>Кількість балів</th>
                             <th>Коментар</th>
+                            <th>Підтвердження</th>
                         </tr>
                     </thead>
                     <tbody>
                     <c:forEach items="${requestScope.rating}" var="rating">
                     <tr class="bg-tr-blue">
-                        <th  scope="row" colspan="5"><c:out value="${rating.paragraph.subblock.block.name}"/></th>
+                        <th  scope="row" colspan="6"><c:out value="${rating.paragraph.subblock.block.name}"/></th>
                     </tr>
                     <tr class="text-center">
-                        <th  scope="row" colspan="5"><c:out value="${rating.paragraph.subblock.name}"/></th>
+                        <th  scope="row" colspan="6"><c:out value="${rating.paragraph.subblock.name}"/></th>
                     </tr>
                     <tr>
                         <td scope="row"><c:out value="${counter}"/></td>
+                        <td style="display:none" id="ratingId"><c:out value="${rating.id}"/></td>
                         <td><c:out value="${rating.paragraph.name}"/></td>
                         <td><c:out value="${rating.date}"/></td>
                         <td><c:out value="${rating.score}"/></td>
                         <td><c:out value="${rating.comment}"/></td>
+                        <td>
+                            <select id="status">
+                                <option value="accept">Підтвердити</option>
+                                <option value="decline">Відхилити</option>
+                                <option value="default" selected>Залишити без змін</option>
+                            </select>
+                        </td>
                     </tr>
                     <c:set var="counter" value="${counter+1}" />
                     <c:set var="total" value="${total+rating.score}"/>
@@ -89,7 +97,7 @@
                 <div class="row justify-content-center raiting_margin">
                     <div class="col-3 text-center">Сумарно балів -   <span class="bg-blue span-bal"><fmt:formatNumber type="number" maxIntegerDigits = "3" value="${total}"/></span></div>
                     <div class="col-3 text-center">Кінцевий результат-  <span class="bg-green span-bal">
-                        <c:if test="${total>10}">
+                        <c:if test="${total>=10}">
                             <fmt:formatNumber type="number" value="${10}" maxIntegerDigits="3"/>
                         </c:if>
                         <c:if test="${total<10 && total>0}">
@@ -107,7 +115,7 @@
                     </div>
                     <div class="col-3">
                         <button class="btn bg-red col btn-sm" id="reject" onclick="showDropdown()">
-                            <a class="anchor">Не підтверджувати рейтинг</a>
+                            <a class="anchor">Відхилити рейтинг</a>
                         </button>
                     </div>
                 </div>
@@ -140,14 +148,10 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
-
-
 </div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 </body>

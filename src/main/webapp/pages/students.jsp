@@ -2,7 +2,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
-<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
@@ -17,10 +16,9 @@
 
     <title>Моя група</title>
 
-    <link href="${contextPath}/pages/css/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link href="${contextPath}/pages/css/style.css" rel="stylesheet">
 </head>
-
 <body>
 <nav class="navbar navbar-expand-lg bg-blue">
     <a class="navbar-brand" href="/"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/nubip_bottom_logo_ua.png" alt=""/></a>
@@ -46,6 +44,7 @@
                 <li><a href="/welcome"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item1.png"/><span class="text-uppercase">Головна сторінка</span></a></li>
                 <li><a href="/profile"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item2.png"/><span class="text-uppercase">Профіль</span></a></li>
                 <li><a href="/rating"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item3.png"/><span class="text-uppercase">Заповнити рейтинг</span></a></li>
+                <li><a href="/my-rating"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item7.png"/><span class="text-uppercase">Мій рейтинг</span></a></li>
                 <li><a href="/students"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item6.png"/><span class="text-uppercase">Мої студенти</span></a></li>
                 <li><a href="/check-rating"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item4.png"/><span class="text-uppercase">Перевірити рейтинг</span></a></li>
                 <li><a href="/reports"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item5.png"/><span class="text-uppercase">Звіти</span></a></li>
@@ -55,67 +54,72 @@
             <div class="content">
                 <c:set var="groups" scope="request" value="${requestScope.groups}"/>
                 <c:forEach items="${groups}" var="group">
-                    <c:set var="counter" value="${1}"/>
-                    <div class="mx-auto text-center col-md-6">
-                        <a class="btn btn-pri btn-proverka text-center" href="#" role="button">
-                            <c:out value="Група ${group.name}"/>
-                            <img class="img_nubip img-fluid" src="${contextPath}/pages/img/group.png"/>
-                        </a>
-                    </div>
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th class="students" colspan="5">Мої студенти</th>
-                        </tr>
-                        <tr>
-                            <th>#</th>
-                            <th>Прізвище</th>
-                            <th>Ім'я</th>
-                            <th>Телефон</th>
-                            <th style="width: 30%">Статус</th>
-                        </tr>
-                        </thead>
-                            <tbody id="tBody">
-                            <c:forEach items="${group.students}" var="student">
+                    <c:if test="${group.students.size()!=0}">
+                        <c:set var="counter" value="${1}"/>
+                        <div class="mx-auto text-center col-md-6">
+                            <a class="btn btn-pri btn-proverka text-center" href="#" role="button">
+                                <c:out value="Група ${group.name}"/>
+                                <img class="img_nubip img-fluid" src="${contextPath}/pages/img/group.png"/>
+                            </a>
+                        </div>
+                        <table class="table">
+                            <thead>
                             <tr>
-                                <td class="column"><c:out value="${counter}"/></td>
-                                <td><c:out value="${student.studentSurname}"/></td>
-                                <td><c:out value="${student.studentName}"/></td>
-                                <td><c:out value="${student.phone}"/></td>
-                                <c:choose>
-                                    <c:when test="${student.isRatingFilled()}">
-                                        <td class="text-danger status">Не заповнено</td>
-                                    </c:when>
-
-                                    <c:when test="${sessionScope.student.role.getAuthority() == 'ROLE_HEAD_OF_GROUP'}">
-                                        <c:if test="${student.ratings[0].stageOfApprove >= 1}">
-                                            <td class="text-success status">Перевірено</td>
-                                        </c:if>
-                                        <c:if test="${student.ratings[0].stageOfApprove == 0}">
-                                            <td class="text-warning status">Потребує перевірки</td>
-                                        </c:if>
-                                    </c:when>
-
-                                    <c:when test="${sessionScope.student.role.getAuthority() == 'ROLE_HEAD_OF_SO'}">
-                                        <c:if test="${student.ratings[0].stageOfApprove == 2}">
-                                            <td class="text-success status">Перевірено</td>
-                                        </c:if>
-                                        <c:if test="${student.ratings[0].stageOfApprove == 1}">
-                                            <td class="text-warning status">Потребує перевірки</td>
-                                        </c:if>
-                                        <c:if test="${student.ratings[0].stageOfApprove == 0}">
-                                            <td class="text-warning status">Потребує перевірки стростою</td>
-                                        </c:if>
-                                    </c:when>
-                                </c:choose>
+                                <th class="students" colspan="5">Мої студенти</th>
                             </tr>
-                            <c:set var="counter" value="${counter+1}"/>
-                            </c:forEach>
-                            </tbody>
-                    </table>
+                            <tr>
+                                <th>#</th>
+                                <th>Прізвище</th>
+                                <th>Ім'я</th>
+                                <th>Телефон</th>
+                                <th style="width: 30%">Статус</th>
+                            </tr>
+                            </thead>
+                                <tbody id="tBody">
+                                <c:forEach items="${group.students}" var="student">
+                                <tr>
+                                    <td class="column"><c:out value="${counter}"/></td>
+                                    <td><c:out value="${student.studentSurname}"/></td>
+                                    <td><c:out value="${student.studentName}"/></td>
+                                    <td><c:out value="${student.phone}"/></td>
+                                    <c:choose>
+                                        <c:when test="${student.isRatingFilled()}">
+                                            <td class="text-danger status">Не заповнено</td>
+                                        </c:when>
+
+                                        <c:when test="${student.isAllRatingDeclined()}">
+                                            <td class="text-dark status">Відхилено</td>
+                                        </c:when>
+
+                                        <c:when test="${sessionScope.student.role.getAuthority() == 'ROLE_HEAD_OF_GROUP'}">
+                                            <c:if test="${student.isAllRatingUnaproved() || !student.isAllRatingUnaproved()}">
+                                                <td class="text-warning status">Потребує перевірки</td>
+                                            </c:if>
+                                            <c:if test="${student.isAllApprovedByHeadOfGroup()}">
+                                                <td class="text-success status">Перевірено</td>
+                                            </c:if>
+                                        </c:when>
+
+                                        <c:when test="${sessionScope.student.role.getAuthority() == 'ROLE_HEAD_OF_SO'}">
+                                            <c:if test="${student.isAllApprovedByHeadOfGroup()}">
+                                                <td class="text-warning status">Потребує перевірки</td>
+                                            </c:if>
+                                            <c:if test="${student.isAllRatingUnaproved() || !student.isAllRatingUnaproved()}">
+                                                <td class="text-warning status">Потребує перевірки стростою</td>
+                                            </c:if>
+                                            <c:if test="${student.isAllApprovedByHeadOfSo()}">
+                                                <td class="text-success status">Перевірено</td>
+                                            </c:if>
+                                        </c:when>
+                                    </c:choose>
+                                </tr>
+                                <c:set var="counter" value="${counter+1}"/>
+                                </c:forEach>
+                                </tbody>
+                        </table>
+                    </c:if>
                 </c:forEach>
             </div>
-
         </div>
     </div>
 </div>

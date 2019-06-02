@@ -1,10 +1,12 @@
 package com.student.rating.service.impl;
 
+import static com.student.rating.constants.Constants.APPROVED_BY_HEAD_OF_GROUP;
 import static com.student.rating.constants.Constants.EMAIL_ATTRIBUTE;
 import static com.student.rating.constants.Constants.ID_ATTRIBUTE;
 import static com.student.rating.constants.Constants.OKR_ATTRIBUTE;
 import static com.student.rating.constants.Constants.ROLE_ATTRIBUTE;
 import static com.student.rating.constants.Constants.STUDENT_FULL_NAME_ATTRIBUTE;
+import static com.student.rating.constants.Constants.UNAPROVED;
 import static com.student.rating.constants.Constants.USERNAME_ATTRIBUTE;
 import static com.student.rating.utility.StaticDataEngine.OKR_LIST;
 import static java.lang.Integer.parseInt;
@@ -136,13 +138,13 @@ public class StudentServiceImpl implements StudentService {
 		DateTime currentDate = new DateTime();
 		DateTime monthStart = currentDate.dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
 		DateTime monthEnd = currentDate.dayOfMonth().withMaximumValue().withTimeAtStartOfDay();
-		if(role.equalsIgnoreCase("[ROLE_HEAD_OF_GROUP]")) {
+		if(role.equals(Role.HEAD_OF_GROUP.getFullAuthority())) {
 			Student student = studentRepository.findByUsername(studentName);
 			Group group = student.getGroup();
-			students = studentRepository.findAllStudentsByGroupIdAndRatingsStageOfApprove(group.getId(), 0, monthStart.toDate(), monthEnd.toDate());
+			students = studentRepository.findAllStudentsByGroupIdAndRatingsStageOfApprove(group.getId(), UNAPROVED, monthStart.toDate(), monthEnd.toDate());
 		}
-		if(role.equalsIgnoreCase("[ROLE_HEAD_OF_SO]")) {
-			students = studentRepository.findAllStudentsRatingsStageOfApprove(1, monthStart.toDate(), monthEnd.toDate());
+		if(role.equals(Role.HEAD_OF_SO.getFullAuthority())) {
+			students = studentRepository.findAllStudentsRatingsStageOfApprove(APPROVED_BY_HEAD_OF_GROUP, monthStart.toDate(), monthEnd.toDate());
 		}
 		return students;
 	}

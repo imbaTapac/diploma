@@ -15,12 +15,15 @@
 
     <title>Звіти</title>
 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.17/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.17/css/dataTables.bootstrap.min.css" rel="stylesheet">
+
     <link href="${contextPath}/pages/css/style.css" rel="stylesheet">
     <link href="${contextPath}/pages/css/report.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
     <script src="https://cdn.datatables.net/1.10.17/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
@@ -30,9 +33,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
 
-    <link href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.10.17/css/jquery.dataTables.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.10.17/css/dataTables.bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
@@ -60,6 +60,7 @@
                 <li><a href="/welcome"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item1.png"/><span class="text-uppercase">Головна сторінка</span></a></li>
                 <li><a href="/profile"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item2.png"/><span class="text-uppercase">Профіль</span></a></li>
                 <li><a href="/rating"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item3.png"/><span class="text-uppercase">Заповнити рейтинг</span></a></li>
+                <li><a href="/my-rating"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item7.png"/><span class="text-uppercase">Мій рейтинг</span></a></li>
                 <li><a href="/students"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item6.png"/><span class="text-uppercase">Мої студенти</span></a></li>
                 <li><a href="/check-rating"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item4.png"/><span class="text-uppercase">Перевірити рейтинг</span></a></li>
                 <li><a href="/reports"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item5.png"/><span class="text-uppercase">Звіти</span></a></li>
@@ -75,9 +76,17 @@
                                 <p class="text-center report_p">Звіти в EXCEL <img class=" img-fluid" src="${contextPath}/pages/img/excel-top.png" alt="" /></p>
                             </div>
                             <div class="report-top-body">
-                                <button type="button" class="btn btn-bg-report col btn-sm" onclick="location.href='/report_by_group'">По всіх групах та їх студентах</button>
-                                <button type="button" class="btn btn-bg-report col btn-sm" onclick="location.href='/avg_report_by_groups'">По групах загальний</button>
-                                <button type="button" class="btn btn-bg-report col btn-sm">Студенти за курсом</button>
+                                <c:choose>
+                                    <c:when test="${sessionScope.student.role.getAuthority() == 'ROLE_HEAD_OF_GROUP'}">
+                                        <button type="button" class="btn btn-bg-report col btn-sm" onclick="location.href='/report_by_group'">По групі та студентах</button>
+                                        <button type="button" class="btn btn-bg-report col btn-sm" onclick="location.href='/avg_report_by_groups'">По групі загальний</button>
+                                    </c:when>
+                                    <c:when test="${sessionScope.student.role.getAuthority() == 'ROLE_HEAD_OF_SO'}">
+                                        <button type="button" class="btn btn-bg-report col btn-sm" onclick="location.href='/report_by_group'">По всіх групах та їх студентах</button>
+                                        <button type="button" class="btn btn-bg-report col btn-sm" onclick="location.href='/avg_report_by_groups'">По групах загальний</button>
+                                        <button type="button" class="btn btn-bg-report col btn-sm">Студенти за курсом</button>
+                                    </c:when>
+                                </c:choose>
                             </div>
                         </div>
                     </div>
@@ -126,6 +135,7 @@
                                 <th>Підблок</th>
                                 <th>Пункт</th>
                                 <th>Бал</th>
+                                <th>Коментар</th>
                             </tr>
                             </thead>
                         </table>

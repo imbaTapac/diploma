@@ -1,5 +1,10 @@
 package com.student.rating.entity;
 
+import static com.student.rating.constants.Constants.APPROVED_BY_HEAD_OF_GROUP;
+import static com.student.rating.constants.Constants.APPROVED_BY_HEAD_OF_SO;
+import static com.student.rating.constants.Constants.DECLINED;
+import static com.student.rating.constants.Constants.UNAPROVED;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +35,7 @@ public class Student implements Serializable {
 	@Column(name = "id_student", nullable = false)
 	private Long id;
 
-	@Column(columnDefinition = "NVARCHAR(12)")
+	@Column(columnDefinition = "NVARCHAR(36)")
 	private String username;
 
 	@Column
@@ -183,6 +188,22 @@ public class Student implements Serializable {
 
 	public boolean isRatingFilled() {
 		return this.ratings.isEmpty();
+	}
+
+	public boolean isAllRatingDeclined(){
+		return this.ratings.stream().allMatch(rating -> rating.getStageOfApprove().equals(DECLINED));
+	}
+
+	public boolean isAllRatingUnaproved(){
+		return this.ratings.stream().allMatch(rating -> rating.getStageOfApprove().equals(UNAPROVED));
+	}
+
+	public boolean isAllApprovedByHeadOfGroup(){
+		return this.ratings.stream().allMatch(rating -> rating.getStageOfApprove().equals(APPROVED_BY_HEAD_OF_GROUP));
+	}
+
+	public boolean isAllApprovedByHeadOfSo(){
+		return this.ratings.stream().allMatch(rating -> rating.getStageOfApprove().equals(APPROVED_BY_HEAD_OF_SO));
 	}
 
 

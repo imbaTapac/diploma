@@ -7,9 +7,6 @@ INSERT INTO `specialty` (`code`,`name`,`id_faculty`) VALUES ('13','Інжене�
 INSERT INTO `specialty` (`code`,`name`,`id_faculty`) VALUES ('14','Економічна кібернетика',1);
 INSERT INTO `specialty` (`code`,`name`,`id_faculty`) VALUES ('15','Комп\'ютерний еколого-економічний моніторинг',1);
 INSERT INTO `specialty` (`code`,`name`,`id_faculty`) VALUES ('16','Інформаційні управляючі системи та технології',1);
-INSERT INTO `specialty` (`code`,`name`,`id_faculty`) VALUES ('17','Комп\'ютерна інженерія',1);
-INSERT INTO `specialty` (`code`,`name`,`id_faculty`) VALUES ('18','Інженерія програмного забезпечення',1);
-INSERT INTO `specialty` (`code`,`name`,`id_faculty`) VALUES ('19','Економічна кібернетика',1);
 
 INSERT INTO `specialty` (`code`,`name`,`id_faculty`) VALUES ('21','Інженерна механіка',2);
 

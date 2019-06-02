@@ -19,4 +19,10 @@ public class Constants {
 
     /* Faculty names */
     public static final String IT_FACULTY = "Інформаційних технологій";
+
+    /* Approve stages */
+	public static final Integer DECLINED = -1;
+	public static final Integer UNAPROVED = 0;
+	public static final Integer APPROVED_BY_HEAD_OF_GROUP = 1;
+	public static final Integer APPROVED_BY_HEAD_OF_SO = 2;
 }

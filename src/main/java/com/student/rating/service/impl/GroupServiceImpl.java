@@ -24,8 +24,12 @@ import org.springframework.stereotype.Service;
 import com.student.rating.context.LDAPAttributesContextHolder;
 import com.student.rating.entity.Faculty;
 import com.student.rating.entity.Group;
+import com.student.rating.entity.Rating;
+import com.student.rating.entity.Role;
 import com.student.rating.entity.Student;
+import com.student.rating.exception.StudentRatingBaseException;
 import com.student.rating.repository.GroupRepository;
+import com.student.rating.repository.RatingRepository;
 import com.student.rating.repository.StudentRepository;
 import com.student.rating.service.GroupService;
 
@@ -36,12 +40,15 @@ public class GroupServiceImpl implements GroupService {
 
 	private final GroupRepository groupRepository;
 	private final StudentRepository studentRepository;
+	private final RatingRepository ratingRepository;
 	private final LDAPAttributesContextHolder ldapAttributesContextHolder;
 
 	@Autowired
-	public GroupServiceImpl(GroupRepository groupRepository, StudentRepository studentRepository, LDAPAttributesContextHolder ldapAttributesContextHolder) {
+	public GroupServiceImpl(GroupRepository groupRepository, StudentRepository studentRepository, LDAPAttributesContextHolder ldapAttributesContextHolder,
+	                        RatingRepository ratingRepository) {
 		this.groupRepository = groupRepository;
 		this.studentRepository = studentRepository;
+		this.ratingRepository = ratingRepository;
 		this.ldapAttributesContextHolder = ldapAttributesContextHolder;
 	}
 
@@ -51,19 +58,22 @@ public class GroupServiceImpl implements GroupService {
 		DateTime currentDate = new DateTime();
 		DateTime monthStart = currentDate.dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
 		DateTime monthEnd = currentDate.dayOfMonth().withMaximumValue().withTimeAtStartOfDay();
-		if(role.equalsIgnoreCase("[ROLE_HEAD_OF_GROUP]")) {
+		if(role.equals(Role.HEAD_OF_GROUP.getFullAuthority())) {
 			String name = SecurityContextHolder.getContext().getAuthentication().getName();
-			Student student = studentRepository.findByUsername(name);
-			Long groupId = student.getGroup().getId();
-			List<Student> list = studentRepository.findAllStudentsInGroupWithRatings(groupId, monthStart.toDate(), monthEnd.toDate());
-			Group group = student.getGroup();
-			group.setStudents(list);
+			Student headOfGroup = studentRepository.findByUsername(name);
+			Group group = groupRepository.findGroupById(headOfGroup.getGroup().getId()).orElseThrow(() -> new StudentRatingBaseException(404, "Wrong group id"));
+			for(Student student : group.getStudents()) {
+				List<Rating> ratings = ratingRepository.findAllRatingsByStudentIdAndDateBetween(student.getId(), monthStart.toDate(), monthEnd.toDate());
+				student.setRatings(ratings);
+			}
 			return Collections.singletonList(group);
 		} else {
 			List<Group> groups = groupRepository.findAll();
 			for(Group group : groups) {
-				List<Student> students = studentRepository.findAllStudentsInGroupWithRatings(group.getId(), monthStart.toDate(), monthEnd.toDate());
-				group.setStudents(students);
+				for(Student student : group.getStudents()) {
+					List<Rating> ratings = ratingRepository.findAllRatingsByStudentIdAndDateBetween(student.getId(), monthStart.toDate(), monthEnd.toDate());
+					student.setRatings(ratings);
+				}
 			}
 			return groups;
 		}
