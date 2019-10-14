@@ -1,5 +1,7 @@
 package com.student.rating.service.impl;
 
+import com.student.rating.entity.Student;
+import com.student.rating.service.StudentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +13,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.student.rating.entity.Student;
-import com.student.rating.service.StudentService;
 
 import java.util.Collections;
 import java.util.Set;

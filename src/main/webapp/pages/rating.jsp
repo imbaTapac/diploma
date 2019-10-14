@@ -6,6 +6,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<c:set var="role" value="${sessionScope.student.role.getAuthority()}"/>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -43,7 +44,7 @@
         <div class="col-md-3">
             <ul class="nav nav-left">
                 <c:choose>
-                    <c:when test="${requestScope.role=='[ROLE_HEAD_OF_GROUP]' || requestScope.role=='[ROLE_HEAD_OF_SO]'}">
+                    <c:when test="${role=='ROLE_HEAD_OF_GROUP' || role=='ROLE_HEAD_OF_SO'}">
                         <li><a href="/welcome"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item1.png"/><span class="text-uppercase">Головна сторінка</span></a></li>
                         <li><a href="/profile"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item2.png"/><span class="text-uppercase">Профіль</span></a></li>
                         <li><a href="/rating"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item3.png"/><span class="text-uppercase">Заповнити рейтинг</span></a></li>
@@ -52,7 +53,7 @@
                         <li><a href="/check-rating"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item4.png"/><span class="text-uppercase">Перевірити рейтинг</span></a></li>
                         <li><a href="/reports"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item5.png"/><span class="text-uppercase">Звіти</span></a></li>
                     </c:when>
-                    <c:when test="${requestScope.role=='[ROLE_STUDENT]'}">
+                    <c:when test="${role=='ROLE_STUDENT'}">
                         <li><a href="/welcome"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item1.png"/><span class="text-uppercase">Головна сторінка</span></a></li>
                         <li><a href="/profile"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item2.png"/><span class="text-uppercase">Профіль</span></a></li>
                         <li><a href="/rating"><img class="img_nubip img-fluid" src="${contextPath}/pages/img/item3.png"/><span class="text-uppercase">Заповнити рейтинг</span></a></li>

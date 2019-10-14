@@ -2,8 +2,9 @@ package com.student.rating.service.impl;
 
 import static com.student.rating.constants.Constants.APPROVED_BY_HEAD_OF_GROUP;
 import static com.student.rating.constants.Constants.APPROVED_BY_HEAD_OF_SO;
+import static com.student.rating.entity.Role.HEAD_OF_GROUP;
+import static com.student.rating.entity.Role.HEAD_OF_SO;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.charts.AxisCrosses;
 import org.apache.poi.ss.usermodel.charts.AxisPosition;
 import org.apache.poi.ss.usermodel.charts.ChartAxis;
@@ -33,20 +35,20 @@ import org.apache.poi.xssf.usermodel.charts.XSSFChartLegend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import com.student.rating.dto.AvgReportByGroupDTO;
 import com.student.rating.dto.OverallReportByGroupDTO;
 import com.student.rating.entity.Group;
 import com.student.rating.entity.Rating;
-import com.student.rating.entity.Role;
 import com.student.rating.entity.Student;
 import com.student.rating.exception.StudentRatingBaseException;
 import com.student.rating.repository.GroupRepository;
 import com.student.rating.repository.RatingRepository;
-import com.student.rating.repository.StudentRepository;
 import com.student.rating.service.ReportService;
+import com.student.rating.service.StudentService;
 
 /**
  * Created by Тарас on 11.06.2018.
@@ -55,208 +57,181 @@ import com.student.rating.service.ReportService;
 public class ReportServiceImpl implements ReportService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReportServiceImpl.class);
+	private static final String ERROR_WRITING_TO_FILE = "Error during writing data to file ";
 
 	private final RatingRepository ratingRepository;
-	private final StudentRepository studentRepository;
+	private final StudentService studentService;
 	private final GroupRepository groupRepository;
 
 	@Autowired
-	public ReportServiceImpl(RatingRepository ratingRepository, StudentRepository studentRepository, GroupRepository groupRepository) {
+	public ReportServiceImpl(RatingRepository ratingRepository,StudentService studentService, GroupRepository groupRepository) {
 		this.ratingRepository = ratingRepository;
-		this.studentRepository = studentRepository;
+		this.studentService = studentService;
 		this.groupRepository = groupRepository;
 	}
 
 	//TODO : in ver 0.9 code refactoring
 
 	@Override
-	public ByteArrayInputStream reportByGroup() {
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
+	public Resource reportByGroup() {
+		XSSFWorkbook book = new XSSFWorkbook();
 
-		try(XSSFWorkbook book = new XSSFWorkbook()) {
-			XSSFSheet sheet = book.createSheet("Звіт по всіх групах та їх студентах");
-			book.getProperties().getCoreProperties().setCreator("Tarasii");
+		XSSFSheet sheet = book.createSheet("Звіт по всіх групах та їх студентах");
+		book.getProperties().getCoreProperties().setCreator("Tarasii");
 
-			int rowNum = 0;
-			String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
-			List<Group> groups = new ArrayList<>();
-			if(role.equals(Role.HEAD_OF_GROUP.getFullAuthority())) {
-				String name = SecurityContextHolder.getContext().getAuthentication().getName();
-				Student student = studentRepository.findByUsername(name);
-				groups = Collections.singletonList(groupRepository.findGroupById(student.getGroup().getId()).orElseThrow(() -> new StudentRatingBaseException(404, "Undefined group")));
+		int rowNum = 0;
+		Student currentStudent = studentService.getCurrentUser();
+		List<Group> groups = new ArrayList<>();
+		if(currentStudent.getRole() == HEAD_OF_GROUP) {
+			groups = Collections.singletonList(groupRepository.findGroupById(currentStudent.getGroup().getId()).orElseThrow(() -> new StudentRatingBaseException(404, "Undefined group")));
+		}
+		else if(currentStudent.getRole() == HEAD_OF_SO) {
+			groups = groupRepository.findAll();
+		}
+		for(Group group : groups) {
+			if(groups.indexOf(group) != 0) {
+				rowNum++;
 			}
-			if(role.equals(Role.HEAD_OF_SO.getFullAuthority())) {
-				groups = groupRepository.findAll();
-			}
-			for(Group group : groups) {
-				if(groups.indexOf(group) != 0) {
-					rowNum++;
-				}
-				Row row = sheet.createRow(rowNum++);
-				int colNum = 0;
-				Cell cell0 = row.createCell(colNum++);
-				cell0.setCellValue("Група " + group.getName());
-				sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, colNum - 1, 2));
-				CellUtil.setAlignment(cell0, HorizontalAlignment.CENTER);
+			Row row = sheet.createRow(rowNum++);
+			int colNum = 0;
+			Cell cell0 = row.createCell(colNum++);
+			cell0.setCellValue("Група " + group.getName());
+			sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, colNum - 1, 2));
+			CellUtil.setAlignment(cell0, HorizontalAlignment.CENTER);
 
+			colNum = 0;
+			Row row1 = sheet.createRow(rowNum++);
+			Cell cell1 = row1.createCell(colNum++);
+			cell1.setCellValue("Прізвище");
+			sheet.autoSizeColumn(cell1.getColumnIndex());
+
+			Cell cell2 = row1.createCell(colNum++);
+			cell2.setCellValue("Ім'я");
+
+			Cell cell3 = row1.createCell(colNum++);
+			cell3.setCellValue("Балів");
+
+			for(Student student : group.getStudents()) {
 				colNum = 0;
-				Row row1 = sheet.createRow(rowNum++);
-				Cell cell1 = row1.createCell(colNum++);
-				cell1.setCellValue("Прізвище");
-				sheet.autoSizeColumn(cell1.getColumnIndex());
+				double sum = 0;
+				Row row2 = sheet.createRow(rowNum++);
 
-				Cell cell2 = row1.createCell(colNum++);
-				cell2.setCellValue("Ім'я");
+				Cell cell4 = row2.createCell(colNum++);
+				cell4.setCellValue(student.getStudentSurname());
 
-				Cell cell3 = row1.createCell(colNum++);
-				cell3.setCellValue("Балів");
+				Cell cell5 = row2.createCell(colNum++);
+				cell5.setCellValue(student.getStudentName());
 
-				for(Student student : group.getStudents()) {
-					colNum = 0;
-					double sum = 0;
-					Row row2 = sheet.createRow(rowNum++);
-
-					Cell cell4 = row2.createCell(colNum++);
-					cell4.setCellValue(student.getStudentSurname());
-
-					Cell cell5 = row2.createCell(colNum++);
-					cell5.setCellValue(student.getStudentName());
-
-					for(Rating rating : student.getRatings()) {
-						sum = sum + rating.getScore();
-					}
-
-					if(sum > 10) {
-						sum = 10;
-					}
-					if(sum < 0) {
-						sum = 0;
-					}
-
-					Cell cell6 = row2.createCell(colNum++);
-					cell6.setCellValue(sum);
+				for(Rating rating : student.getRatings()) {
+					sum = sum + rating.getScore();
 				}
 
+				if(sum > 10) {
+					sum = 10;
+				}
+				if(sum < 0) {
+					sum = 0;
+				}
+
+				Cell cell6 = row2.createCell(colNum++);
+				cell6.setCellValue(sum);
 			}
 
-			try {
-				book.write(os);
-			} catch(IOException e) {
-				LOG.error("Error during writing Excel file.\n {}", e);
-			}
-		} catch(IOException e) {
-			LOG.error(e.getMessage(), e);
 		}
 
-		final byte[] bytes = os.toByteArray();
-
-		return new ByteArrayInputStream(bytes);
+		return createExcelFile(book);
 	}
 
 	@Override
-	public ByteArrayInputStream avgReportByGroups() {
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		try(XSSFWorkbook book = new XSSFWorkbook()) {
-			XSSFSheet sheet = book.createSheet("Звіт по групах загальний");
-			book.getProperties().getCoreProperties().setCreator("Tarasii");
+	public Resource avgReportByGroups() {
+		XSSFWorkbook book = new XSSFWorkbook();
+		XSSFSheet sheet = book.createSheet("Звіт по групах загальний");
+		book.getProperties().getCoreProperties().setCreator("Tarasii");
 
-			String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
-			List<Group> groups = new ArrayList<>();
-			if(role.equals(Role.HEAD_OF_GROUP.getFullAuthority())) {
-				String name = SecurityContextHolder.getContext().getAuthentication().getName();
-				Student student = studentRepository.findByUsername(name);
-				groups = Collections.singletonList(student.getGroup());
-			}
-			if(role.equals(Role.HEAD_OF_SO.getFullAuthority())) {
-				groups = groupRepository.findAll();
-			}
-			int rowNum = 0;
-			int colNum = 0;
-			Row row = sheet.createRow(rowNum++);
+		Student currentStudent = studentService.getCurrentUser();
+		List<Group> groups = new ArrayList<>();
+		if(currentStudent.getRole() == HEAD_OF_GROUP) {
+			groups = Collections.singletonList(currentStudent.getGroup());
+		}
+		else if (currentStudent.getRole() == HEAD_OF_SO) {
+			groups = groupRepository.findAll();
+		}
+		int rowNum = 0;
+		int colNum = 0;
+		Row row = sheet.createRow(rowNum++);
 
-			Cell cell0 = row.createCell(colNum++);
-			cell0.setCellValue("Група");
+		Cell cell0 = row.createCell(colNum++);
+		cell0.setCellValue("Група");
 
-			Cell cell1 = row.createCell(colNum++);
-			cell1.setCellValue("Середня оцінка");
-			sheet.autoSizeColumn(cell1.getColumnIndex());
+		Cell cell1 = row.createCell(colNum++);
+		cell1.setCellValue("Середня оцінка");
+		sheet.autoSizeColumn(cell1.getColumnIndex());
 
-			for(Group group : groups) {
-				colNum = 0;
-				double groupSum = 0;
-				int students = 0;
-				Row row1 = sheet.createRow(rowNum++);
-				Cell cell2 = row1.createCell(colNum++);
-				cell2.setCellValue(group.getName());
+		for(Group group : groups) {
+			colNum = 0;
+			double groupSum = 0;
+			int students = 0;
+			Row row1 = sheet.createRow(rowNum++);
+			Cell cell2 = row1.createCell(colNum++);
+			cell2.setCellValue(group.getName());
 
-				for(Student student : group.getStudents()) {
-					double sum = 0;
-					for(Rating rating : student.getRatings()) {
-						sum = sum + rating.getScore();
-					}
-					students++;
-					if(sum > 10) {
-						sum = 10;
-					}
-					if(sum < 0) {
-						sum = 0;
-					}
-					groupSum += sum;
+			for(Student student : group.getStudents()) {
+				double sum = 0;
+				for(Rating rating : student.getRatings()) {
+					sum = sum + rating.getScore();
 				}
-
-				double summary = (groupSum / students) > 0 ? Math.round(groupSum / students) : 0;
-				//LOG.debug("Students : {}", students);
-				//LOG.debug("Summary : {}", (summary > 0) ? Math.round(summary) : 0);
-				Cell cell3 = row1.createCell(colNum++);
-				cell3.setCellValue(summary);
+				students++;
+				if(sum > 10) {
+					sum = 10;
+				}
+				if(sum < 0) {
+					sum = 0;
+				}
+				groupSum += sum;
 			}
 
-			/* At the end of this step, we have a worksheet with test data, that we want to write into a chart */
-			/* Create a drawing canvas on the worksheet */
-			XSSFDrawing xlsxDrawing = sheet.createDrawingPatriarch();
-			/* Define anchor points in the worksheet to position the chart */
-			XSSFClientAnchor anchor = xlsxDrawing.createAnchor(0, 0, 0, 0, 0, 5, 10, 15);
-			/* Create the chart object based on the anchor point */
-			XSSFChart myLineChart = xlsxDrawing.createChart(anchor);
-			myLineChart.setTitleText("Середнє значення рейтингу по групах");
-			/* Define legends for the line chart and set the position of the legend */
-			XSSFChartLegend legend = myLineChart.getOrCreateLegend();
-			legend.setPosition(LegendPosition.BOTTOM);
-
-			/* Create data for the chart */
-			LineChartData data = myLineChart.getChartDataFactory().createLineChartData();
-
-			/* Define chart AXIS */
-			ChartAxis bottomAxis = myLineChart.getChartAxisFactory().createCategoryAxis(AxisPosition.BOTTOM);
-			ValueAxis leftAxis = myLineChart.getChartAxisFactory().createValueAxis(AxisPosition.LEFT);
-			leftAxis.setCrosses(AxisCrosses.AUTO_ZERO);
-			/* Define Data sources for the chart */
-			/* Set the right cell range that contain values for the chart */
-			/* Pass the worksheet and cell range address as inputs */
-			/* Cell Range Address is defined as First row, last row, first column, last column */
-
-			ChartDataSource<String> xs = DataSources.fromStringCellRange(sheet, new CellRangeAddress(1, (rowNum), 0, 0));
-			ChartDataSource<Number> ys1 = DataSources.fromNumericCellRange(sheet, new CellRangeAddress(1, (rowNum), 1, 1));
-
-			/* Add chart data sources as data to the chart */
-			LineChartSeries series = data.addSeries(xs, ys1);
-			series.setTitle("Середнє значення по групі");
-
-			/* Plot the chart with the inputs from data and chart axis */
-			myLineChart.plot(data, bottomAxis, leftAxis);
-
-			try {
-				book.write(os);
-			} catch(IOException e) {
-				LOG.error("Error during writing Excel file.\n {}", e);
-			}
-		} catch(IOException e) {
-			LOG.error(e.getMessage(), e);
+			double summary = (groupSum / students) > 0 ? Math.round(groupSum / students) : 0;
+			//LOG.debug("Students : {}", students);
+			//LOG.debug("Summary : {}", (summary > 0) ? Math.round(summary) : 0);
+			Cell cell3 = row1.createCell(colNum++);
+			cell3.setCellValue(summary);
 		}
 
-		final byte[] bytes = os.toByteArray();
+		/* At the end of this step, we have a worksheet with test data, that we want to write into a chart */
+		/* Create a drawing canvas on the worksheet */
+		XSSFDrawing xlsxDrawing = sheet.createDrawingPatriarch();
+		/* Define anchor points in the worksheet to position the chart */
+		XSSFClientAnchor anchor = xlsxDrawing.createAnchor(0, 0, 0, 0, 0, 5, 10, 15);
+		/* Create the chart object based on the anchor point */
+		XSSFChart myLineChart = xlsxDrawing.createChart(anchor);
+		myLineChart.setTitleText("Середнє значення рейтингу по групах");
+		/* Define legends for the line chart and set the position of the legend */
+		XSSFChartLegend legend = myLineChart.getOrCreateLegend();
+		legend.setPosition(LegendPosition.BOTTOM);
 
-		return new ByteArrayInputStream(bytes);
+		/* Create data for the chart */
+		LineChartData data = myLineChart.getChartDataFactory().createLineChartData();
+
+		/* Define chart AXIS */
+		ChartAxis bottomAxis = myLineChart.getChartAxisFactory().createCategoryAxis(AxisPosition.BOTTOM);
+		ValueAxis leftAxis = myLineChart.getChartAxisFactory().createValueAxis(AxisPosition.LEFT);
+		leftAxis.setCrosses(AxisCrosses.AUTO_ZERO);
+		/* Define Data sources for the chart */
+		/* Set the right cell range that contain values for the chart */
+		/* Pass the worksheet and cell range address as inputs */
+		/* Cell Range Address is defined as First row, last row, first column, last column */
+
+		ChartDataSource<String> xs = DataSources.fromStringCellRange(sheet, new CellRangeAddress(1, (rowNum), 0, 0));
+		ChartDataSource<Number> ys1 = DataSources.fromNumericCellRange(sheet, new CellRangeAddress(1, (rowNum), 1, 1));
+
+		/* Add chart data sources as data to the chart */
+		LineChartSeries series = data.addSeries(xs, ys1);
+		series.setTitle("Середнє значення по групі");
+
+		/* Plot the chart with the inputs from data and chart axis */
+		myLineChart.plot(data, bottomAxis, leftAxis);
+
+		return createExcelFile(book);
 	}
 
 	@Override
@@ -291,15 +266,13 @@ public class ReportServiceImpl implements ReportService {
 		return avgReportByGroupDTOList;
 	}
 
-	//TODO : in ver_0.9 make report by month
+	//TODO : in ver_1.1 make report by month
 	@Override
 	public List<OverallReportByGroupDTO> overallByGroup() {
 		List<OverallReportByGroupDTO> ratings = new ArrayList<>();
-		String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
-		if(role.equals(Role.HEAD_OF_GROUP.getFullAuthority())) {
-			String name = SecurityContextHolder.getContext().getAuthentication().getName();
-			Student headOfGroup = studentRepository.findByUsername(name);
-			List<Student> studentList = studentRepository.findAllStudentsByGroupId(headOfGroup.getGroup().getId());
+		Student currentStudent = studentService.getCurrentUser();
+		if(currentStudent.getRole() == HEAD_OF_GROUP) {
+			List<Student> studentList = studentService.findAllStudentsByStudentGroupId(currentStudent);
 			for(Student student : studentList) {
 				student.setRatings(ratingRepository.findAllRatingsByStudentIdAndStageOfApprove(student.getId(), APPROVED_BY_HEAD_OF_GROUP));
 				for(Rating rating : student.getRatings()) {
@@ -309,7 +282,7 @@ public class ReportServiceImpl implements ReportService {
 
 			}
 		}
-		if(role.equals(Role.HEAD_OF_SO.getFullAuthority())) {
+		else if((currentStudent.getRole() == HEAD_OF_SO)) {
 			List<Rating> ratingList = ratingRepository.findAllRatingsByStageOfApprove(APPROVED_BY_HEAD_OF_SO);
 			for(Rating rating : ratingList) {
 				OverallReportByGroupDTO reportByGroup = buildOverallReport(rating);
@@ -331,6 +304,17 @@ public class ReportServiceImpl implements ReportService {
 		reportByGroup.setScore(rating.getScore());
 		reportByGroup.setComment(rating.getComment());
 		return reportByGroup;
+	}
+
+	private Resource createExcelFile(Workbook workbook) {
+		try(ByteArrayOutputStream out = new ByteArrayOutputStream();
+		    Workbook excel = workbook) {
+			excel.write(out);
+			return new ByteArrayResource(out.toByteArray());
+		} catch(IOException e) {
+			LOG.error("Error while writing excel file");
+			throw new StudentRatingBaseException(500, ERROR_WRITING_TO_FILE + "for " + workbook.getSheetName(0),e);
+		}
 	}
 }
 

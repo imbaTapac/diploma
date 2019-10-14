@@ -2,6 +2,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<c:set var="profile" value="${requestScope.profile}"/>
 
 <!DOCTYPE html>
         <html>
@@ -60,7 +61,7 @@
                             <img src="${contextPath}/pages/img/avatar_user.png" class="img-fluid" alt="" />
                         </div>
                         <div class="name_user">
-                            <p class="text-center"><c:out value=" ${student.studentSurname} ${student.studentName}"/></p>
+                            <p class="text-center"><c:out value=" ${profile.studentSurname} ${profile.studentName}"/></p>
                         </div>
                     </div>
                     <div class="col items_block">
@@ -106,7 +107,7 @@
                                     Факультет
                                 </div>
                                 <div class="col-6 text_user_item2">
-                                    <c:out value="${student.group.faculty.name}"/>
+                                    <c:out value="${profile.facultyName}"/>
                                 </div>
                             </div>
                             <div class="row">
@@ -117,7 +118,7 @@
                                     Спеціальність
                                 </div>
                                 <div class="col-6 text_user_item2">
-                                    <c:out value="${student.specialty.name}"/>
+                                    <c:out value="${profile.specialtyName}"/>
                                 </div>
                             </div>
                             <div class="row">
@@ -128,7 +129,7 @@
                                     ОКР
                                 </div>
                                 <div class="col-6 text_user_item2">
-                                    <c:out value="${student.okr.name}"/>
+                                    <c:out value="${profile.okrName}"/>
                                 </div>
                             </div>
                             <div class="row">
@@ -139,7 +140,7 @@
                                     Курс
                                 </div>
                                 <div class="col-6 text_user_item2">
-                                    <c:out value="${student.course}"/>
+                                    <c:out value="${profile.course}"/>
                                 </div>
                             </div>
                             <div class="row">
@@ -150,7 +151,7 @@
                                     Група
                                 </div>
                                 <div class="col-6 text_user_item2">
-                                    <c:out value="${student.group.name}"/>
+                                    <c:out value="${profile.groupName}"/>
                                 </div>
                             </div>
                             <div class="row">
@@ -161,11 +162,11 @@
                                     Заповнював рейтинг?
                                 </div>
                                 <div class="col-6 text_user_item2">
-                                    <c:choose>
-                                        <c:when test="${student.ratings.size() != 0}">
+                                   <c:choose>
+                                        <c:when test="${profile.ratingFilled == 'true'}">
                                             <a>Так</a>
                                         </c:when>
-                                        <c:when test="${student.ratings.size() ==0}">
+                                        <c:when test="${profile.ratingFilled == 'false'}">
                                             <a>Ні</a>
                                         </c:when>
                                     </c:choose>
@@ -179,7 +180,7 @@
                                     Телефон
                                 </div>
                                 <div class="col-6 text_user_item2">
-                                    <c:out value="${student.phone}"/>
+                                    <c:out value="${profile.phone}"/>
                                 </div>
                             </div>
                             <div class="row">
@@ -190,7 +191,7 @@
                                     Email
                                 </div>
                                 <div class="col-6 text_user_item2">
-                                    <c:out value="${student.email}"/>
+                                    <c:out value="${profile.email}"/>
                                 </div>
                             </div>
                         </div>

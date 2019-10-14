@@ -22,7 +22,7 @@ public class Constants {
 
     /* Approve stages */
 	public static final Integer DECLINED = -1;
-	public static final Integer UNAPROVED = 0;
+	public static final Integer UNAPPROVED = 0;
 	public static final Integer APPROVED_BY_HEAD_OF_GROUP = 1;
 	public static final Integer APPROVED_BY_HEAD_OF_SO = 2;
 }

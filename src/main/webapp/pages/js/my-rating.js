@@ -10,7 +10,6 @@ $(document).ready(function () {
             async: false,
             data: JSON.stringify(date),
             success: function (response) {
-                console.log(response);
                 createNewTableBody(response);
             },
             error: function (response) {

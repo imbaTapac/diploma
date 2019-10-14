@@ -5,33 +5,36 @@ import static com.student.rating.constants.Constants.IT_FACULTY;
 import static com.student.rating.constants.Constants.ORGANIZATIONAL_PERSON;
 import static com.student.rating.constants.Constants.ROLE_ATTRIBUTE;
 import static com.student.rating.constants.Constants.USERNAME_ATTRIBUTE;
-import static com.student.rating.utility.StaticDataEngine.FACULTY_LIST;
+import static com.student.rating.entity.Role.HEAD_OF_GROUP;
+import static com.student.rating.utils.StaticDataEngine.FACULTY_LIST;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.student.rating.context.LDAPAttributesContextHolder;
+import com.student.rating.dto.GroupDTO;
+import com.student.rating.dto.StudentDTO;
 import com.student.rating.entity.Faculty;
 import com.student.rating.entity.Group;
 import com.student.rating.entity.Rating;
-import com.student.rating.entity.Role;
 import com.student.rating.entity.Student;
 import com.student.rating.exception.StudentRatingBaseException;
+import com.student.rating.mapper.StudentDTOMapper;
 import com.student.rating.repository.GroupRepository;
 import com.student.rating.repository.RatingRepository;
-import com.student.rating.repository.StudentRepository;
 import com.student.rating.service.GroupService;
+import com.student.rating.service.StudentService;
+import com.student.rating.utils.DateTimeUtils;
 
 @Service
 public class GroupServiceImpl implements GroupService {
@@ -39,43 +42,46 @@ public class GroupServiceImpl implements GroupService {
 	private static final Logger LOG = LoggerFactory.getLogger(GroupServiceImpl.class);
 
 	private final GroupRepository groupRepository;
-	private final StudentRepository studentRepository;
+	private final StudentService studentService;
+	private final StudentDTOMapper studentDTOMapper;
 	private final RatingRepository ratingRepository;
 	private final LDAPAttributesContextHolder ldapAttributesContextHolder;
 
 	@Autowired
-	public GroupServiceImpl(GroupRepository groupRepository, StudentRepository studentRepository, LDAPAttributesContextHolder ldapAttributesContextHolder,
-	                        RatingRepository ratingRepository) {
+	public GroupServiceImpl(GroupRepository groupRepository, StudentService studentService, LDAPAttributesContextHolder ldapAttributesContextHolder,
+	                        RatingRepository ratingRepository, StudentDTOMapper studentDTOMapper) {
 		this.groupRepository = groupRepository;
-		this.studentRepository = studentRepository;
 		this.ratingRepository = ratingRepository;
 		this.ldapAttributesContextHolder = ldapAttributesContextHolder;
+		this.studentDTOMapper = studentDTOMapper;
+		this.studentService = studentService;
 	}
 
 	@Override
-	public List<Group> groupList() {
-		String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
-		DateTime currentDate = new DateTime();
-		DateTime monthStart = currentDate.dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
-		DateTime monthEnd = currentDate.dayOfMonth().withMaximumValue().withTimeAtStartOfDay();
-		if(role.equals(Role.HEAD_OF_GROUP.getFullAuthority())) {
-			String name = SecurityContextHolder.getContext().getAuthentication().getName();
-			Student headOfGroup = studentRepository.findByUsername(name);
-			Group group = groupRepository.findGroupById(headOfGroup.getGroup().getId()).orElseThrow(() -> new StudentRatingBaseException(404, "Wrong group id"));
+	public List<GroupDTO> findAllGroupsWithStudents() {
+		Student currentStudent = studentService.getCurrentUser();
+		Date monthStart = DateTimeUtils.getCurrentMonthStart();
+		Date monthEnd = DateTimeUtils.getCurrentMonthEnd();
+		if(currentStudent.getRole() == HEAD_OF_GROUP) {
+			List<Student> students = studentService.findAllStudentsByStudentGroupId(currentStudent);
+			Group group = groupRepository.findGroupById(currentStudent.getGroup().getId()).orElseThrow(() -> new StudentRatingBaseException(404, "Wrong group id"));
+			group.setStudents(students);
 			for(Student student : group.getStudents()) {
-				List<Rating> ratings = ratingRepository.findAllRatingsByStudentIdAndDateBetween(student.getId(), monthStart.toDate(), monthEnd.toDate());
-				student.setRatings(ratings);
+				fetchStudentRatings(student, monthStart, monthEnd);
 			}
-			return Collections.singletonList(group);
+			GroupDTO groupDTO = mapGroupToDTO(group);
+			return Collections.singletonList(groupDTO);
 		} else {
 			List<Group> groups = groupRepository.findAll();
+			List<GroupDTO> groupDTOS = new ArrayList<>();
 			for(Group group : groups) {
 				for(Student student : group.getStudents()) {
-					List<Rating> ratings = ratingRepository.findAllRatingsByStudentIdAndDateBetween(student.getId(), monthStart.toDate(), monthEnd.toDate());
-					student.setRatings(ratings);
+					fetchStudentRatings(student, monthStart, monthEnd);
 				}
+				GroupDTO groupDTO = mapGroupToDTO(group);
+				groupDTOS.add(groupDTO);
 			}
-			return groups;
+			return groupDTOS;
 		}
 	}
 
@@ -118,4 +124,16 @@ public class GroupServiceImpl implements GroupService {
 		return groupNames;
 	}
 
+	private GroupDTO mapGroupToDTO(Group group) {
+		List<StudentDTO> studentDTOS = studentDTOMapper.toDTOs(group.getStudents());
+		for(StudentDTO s : studentDTOS) {
+			s.filterRatings();
+		}
+		return new GroupDTO(group, studentDTOS);
+	}
+
+	private void fetchStudentRatings(Student student, Date monthStart, Date monthEnd) {
+		List<Rating> ratings = ratingRepository.findAllRatingsByStudentIdAndDateBetween(student.getId(), monthStart, monthEnd);
+		student.setRatings(ratings);
+	}
 }

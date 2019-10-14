@@ -12,8 +12,8 @@ public class UserDTO implements Serializable {
 	private String specialtyName;
     @JsonProperty("groupName")
     private String groupName;
-    @JsonProperty("promoCode")
-    private String promoCode = "";
+    @JsonProperty("roleCode")
+    private String roleCode = "";
     @JsonProperty("phone")
     private String phone;
     @JsonProperty("password")
@@ -37,12 +37,12 @@ public class UserDTO implements Serializable {
 		this.specialtyName = specialtyName;
 	}
 
-	public String getPromoCode() {
-		return promoCode;
+	public String getRoleCode() {
+		return roleCode;
 	}
 
-	public void setPromoCode(String promoCode) {
-		this.promoCode = promoCode;
+	public void setRoleCode(String roleCode) {
+		this.roleCode = roleCode;
 	}
 
 	public String getGroupName() {
@@ -83,7 +83,7 @@ public class UserDTO implements Serializable {
 				"course='" + course + '\'' +
 				", specialtyName='" + specialtyName + '\'' +
 				", groupName='" + groupName + '\'' +
-				", promoCode='" + promoCode + '\'' +
+				", roleCode='" + roleCode + '\'' +
 				", phone='" + phone + '\'' +
 				", password='" + password + '\'' +
 				", confirmPassword='" + confirmPassword + '\'' +

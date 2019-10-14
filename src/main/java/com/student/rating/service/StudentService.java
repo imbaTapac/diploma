@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import com.student.rating.dto.StudentProfileDTO;
 import com.student.rating.dto.UserDTO;
 import com.student.rating.entity.Student;
 
@@ -21,9 +22,21 @@ public interface StudentService {
 
 	Student findById(Long id);
 
+	/**
+	 * Retrieves current Student
+	 * @return
+	 */
+	Student getCurrentUser();
+
 	List<Student> findAll();
 
-	List<Student> findAllStudentsByGroupId();
+	/**
+	 * Retrieves student by student groupId if role is {@link com.student.rating.entity.Role#HEAD_OF_GROUP} or
+	 * retrieves all students if role is {@link com.student.rating.entity.Role#HEAD_OF_SO}
+	 * @param student
+	 * @return
+	 */
+	List<Student> findAllStudentsByStudentGroupId(Student student);
 
 	List<Student> findStudentRatings();
 
@@ -32,4 +45,6 @@ public interface StudentService {
 	boolean searchInLDAP(String userName, String email);
 
 	Student createNewStudentFromLDAPAttribute();
+
+	StudentProfileDTO getStudentProfile();
 }

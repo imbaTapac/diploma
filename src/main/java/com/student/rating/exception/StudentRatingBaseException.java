@@ -8,4 +8,13 @@ public class StudentRatingBaseException extends RuntimeException{
 		super(message);
 		this.status = status;
 	}
+
+	public StudentRatingBaseException(int status, String message,Throwable cause){
+		super(message,cause);
+		this.status = status;
+	}
+
+	public int getStatusCode() {
+		return status;
+	}
 }

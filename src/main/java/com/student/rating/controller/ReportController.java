@@ -1,68 +1,86 @@
 package com.student.rating.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.student.rating.service.ReportService;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
+import com.student.rating.dto.AvgReportByGroupDTO;
+import com.student.rating.dto.OverallReportByGroupDTO;
+import com.student.rating.service.ReportService;
 
 @Controller
 public class ReportController {
 
-    private final ReportService reportService;
+	private final ReportService reportService;
 
-    private static final String APPLICATION_EXCEL = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+	private static final String APPLICATION_EXCEL = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-    @Autowired
-    public ReportController(ReportService reportService) {
-        this.reportService = reportService;
-    }
+	@Autowired
+	public ReportController(ReportService reportService) {
+		this.reportService = reportService;
+	}
 
-    @Secured({"ROLE_HEAD_OF_GROUP", "ROLE_HEAD_OF_SO", "ROLE_ADMINISTRATOR"})
-    @GetMapping(value = "/reports")
-    public String reports() {
-        return "reports";
-    }
+	@Secured({"ROLE_HEAD_OF_GROUP", "ROLE_HEAD_OF_SO", "ROLE_ADMINISTRATOR"})
+	@GetMapping(value = "/reports")
+	public String reports() {
+		return "reports";
+	}
 
-    @GetMapping(value = "/report_by_group")
-    public @ResponseBody
-    void reportByGroup(HttpServletResponse response) throws IOException {
-        InputStream inputStream = reportService.reportByGroup();
-        response.setContentType(APPLICATION_EXCEL);
-        response.setHeader("Content-disposition", "attachment;filename=ReportByGroup.xlsx");
-        FileCopyUtils.copy(inputStream, response.getOutputStream());
-    }
+	@Secured({"ROLE_HEAD_OF_GROUP", "ROLE_HEAD_OF_SO", "ROLE_ADMINISTRATOR"})
+	@GetMapping(value = "/reportByGroup")
+	public ResponseEntity<Resource> reportByGroup() {
+		Resource report = reportService.reportByGroup();
+		String contentDisposition = buildContentDisposition("groupReport");
 
-    @GetMapping(value = "/avg_report_by_groups")
-    public @ResponseBody
-    void avgReportByGroups(HttpServletResponse response) throws IOException {
-        InputStream inputStream = reportService.avgReportByGroups();
-        response.setContentType(APPLICATION_EXCEL);
-        response.setHeader("Content-disposition", "attachment;filename=ReportByGroup1.xlsx");
-        FileCopyUtils.copy(inputStream, response.getOutputStream());
-    }
+		return ResponseEntity.ok()
+				.header(CONTENT_DISPOSITION, contentDisposition)
+				.header(CONTENT_TYPE, APPLICATION_EXCEL)
+				.body(report);
+	}
 
-    @PostMapping(value = "/statistic_report1", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public @ResponseBody
-    String statisticReportByGroups() throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(reportService.avgReportByGroup());
-    }
+	@Secured({"ROLE_HEAD_OF_GROUP", "ROLE_HEAD_OF_SO", "ROLE_ADMINISTRATOR"})
+	@GetMapping(value = "/avgReportByGroups")
+	public ResponseEntity<Resource> avgReportByGroups() {
+		Resource report = reportService.avgReportByGroups();
+		String contentDisposition = buildContentDisposition("avgReportByGroups");
 
-    @PostMapping(value = "/statistic_report2", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public @ResponseBody
-    String statisticReportOverallByGroup() throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(reportService.overallByGroup());
-    }
+		return ResponseEntity.ok()
+				.header(CONTENT_DISPOSITION, contentDisposition)
+				.header(CONTENT_TYPE, APPLICATION_EXCEL)
+				.body(report);
+	}
+
+	private String buildContentDisposition(String reportType) {
+		return "attachment; filename=\"" + reportType + ".xlsx\"";
+	}
+
+	@Secured({"ROLE_HEAD_OF_GROUP", "ROLE_HEAD_OF_SO", "ROLE_ADMINISTRATOR"})
+	@PostMapping(value = "/statistic_report1")
+	public ResponseEntity<List<AvgReportByGroupDTO>> statisticReportByGroups() {
+		List<AvgReportByGroupDTO> avgReportByGroupDTO = reportService.avgReportByGroup();
+
+		return ResponseEntity.ok()
+				.contentType(MediaType.APPLICATION_JSON_UTF8)
+				.body(avgReportByGroupDTO);
+	}
+
+	@Secured({"ROLE_HEAD_OF_GROUP", "ROLE_HEAD_OF_SO", "ROLE_ADMINISTRATOR"})
+	@PostMapping(value = "/statistic_report2")
+	public ResponseEntity<List<OverallReportByGroupDTO>> statisticReportOverallByGroup() {
+		List<OverallReportByGroupDTO> overallReportByGroupDTO = reportService.overallByGroup();
+
+		return ResponseEntity.ok()
+				.contentType(MediaType.APPLICATION_JSON_UTF8)
+				.body(overallReportByGroupDTO);
+	}
 }

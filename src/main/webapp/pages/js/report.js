@@ -66,6 +66,7 @@ $(document).ready(function () {
             mimeType: 'application/json',
             async: false,
             success: function (data) {
+                console.log(data);
                 tableHandler();
                 $('#overall-report-by-group').DataTable({
                     destroy: true,

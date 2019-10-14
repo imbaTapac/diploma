@@ -1,37 +1,32 @@
 package com.student.rating.service.impl;
 
-import static com.student.rating.constants.Constants.APPROVED_BY_HEAD_OF_GROUP;
-import static com.student.rating.constants.Constants.APPROVED_BY_HEAD_OF_SO;
-import static com.student.rating.constants.Constants.UNAPROVED;
-import static java.util.Objects.isNull;
+import com.student.rating.dto.ActionRatingDTO;
+import com.student.rating.dto.RatingDTO;
+import com.student.rating.entity.Paragraph;
+import com.student.rating.entity.Rating;
+import com.student.rating.entity.Student;
+import com.student.rating.exception.DuplicateRatingException;
+import com.student.rating.exception.StudentRatingBaseException;
+import com.student.rating.repository.ParagraphRepository;
+import com.student.rating.repository.RatingRepository;
+import com.student.rating.service.RatingService;
+import com.student.rating.service.StudentService;
+import com.student.rating.utils.DateTimeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpSession;
-
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.student.rating.dto.ActionRatingDTO;
-import com.student.rating.dto.RatingDTO;
-import com.student.rating.entity.Paragraph;
-import com.student.rating.entity.Rating;
-import com.student.rating.entity.Role;
-import com.student.rating.entity.Student;
-import com.student.rating.exception.DuplicateRatingException;
-import com.student.rating.exception.StudentRatingBaseException;
-import com.student.rating.repository.ParagraphRepository;
-import com.student.rating.repository.RatingRepository;
-import com.student.rating.repository.StudentRepository;
-import com.student.rating.service.RatingService;
+import static com.student.rating.constants.Constants.*;
+import static com.student.rating.entity.Role.HEAD_OF_GROUP;
+import static com.student.rating.entity.Role.HEAD_OF_SO;
+import static java.util.Objects.isNull;
 
 /**
  * Created by Тарас on 01.06.2018.
@@ -39,102 +34,112 @@ import com.student.rating.service.RatingService;
 @Service
 public class RatingServiceImpl implements RatingService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(RatingServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RatingServiceImpl.class);
 
-	private final RatingRepository ratingRepository;
-	private final StudentRepository studentRepository;
-	private final ParagraphRepository paragraphRepository;
+    private final RatingRepository ratingRepository;
+    private final StudentService studentService;
+    private final ParagraphRepository paragraphRepository;
 
-	@Autowired
-	public RatingServiceImpl(RatingRepository ratingRepository, StudentRepository studentRepository, ParagraphRepository paragraphRepository) {
-		this.ratingRepository = ratingRepository;
-		this.studentRepository = studentRepository;
-		this.paragraphRepository = paragraphRepository;
-	}
+    @Autowired
+    public RatingServiceImpl(RatingRepository ratingRepository, StudentService studentService, ParagraphRepository paragraphRepository) {
+        this.ratingRepository = ratingRepository;
+        this.studentService = studentService;
+        this.paragraphRepository = paragraphRepository;
+    }
 
-	@Override
-	public List<Rating> save(List<RatingDTO> ratingDTO) {
-		List<Rating> ratings = new ArrayList<>();
-		String studentName = SecurityContextHolder.getContext().getAuthentication().getName();
-		LOG.debug("Student {} trying to save rating", studentName);
-		Student student = studentRepository.findByUsername(studentName);
-		DateTime currentDate = new DateTime();
-		DateTime monthStart = currentDate.dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
-		DateTime monthEnd = currentDate.dayOfMonth().withMaximumValue().withTimeAtStartOfDay();
-		List<Rating> currentMonthRatings = ratingRepository.findAllNotDeclinedStudentRatingsByDateBetween(student.getId(), monthStart.toDate(), monthEnd.toDate());
-		LOG.debug("Ratings that student have {}.\n Ratings that student want to save {}", currentMonthRatings, ratingDTO);
-		//TODO : in ver_0.9 clarify message what ratings is duplicated
-		boolean isDuplicated = currentMonthRatings.stream()
-				.map(r -> r.getParagraph().getId())
-				.anyMatch(id -> ratingDTO.stream()
-						.map(RatingDTO::getParagraphId).anyMatch(id::equals));
-		if(isDuplicated) {
-			LOG.error("Duplicated rating was founded by student {}", student.getUsername());
-			throw new DuplicateRatingException(404, "Duplicated rating was found");
-		}
-		for(RatingDTO studentRating : ratingDTO) {
-			Rating rating = new Rating();
-			rating.setDate(new Date());
-			rating.setStageOfApprove(0);
-			rating.setScore(studentRating.getScore());
-			rating.setComment(studentRating.getComment());
-			Paragraph paragraph = paragraphRepository.findById(studentRating.getParagraphId()).get();
-			rating.setParagraph(paragraph);
-			rating.setStudent(student);
-			ratings.add(rating);
-		}
-		return ratingRepository.saveAll(ratings);
-	}
+    @Override
+    public List<Rating> save(List<RatingDTO> ratingDTO) {
+        List<Rating> ratings = new ArrayList<>();
+        Student student = studentService.getCurrentUser();
+        LOG.debug("Student {} trying to save rating", student.getName());
+        Date monthStart = DateTimeUtils.getCurrentMonthStart();
+        Date monthEnd = DateTimeUtils.getCurrentMonthEnd();
+        List<Rating> currentMonthRatings = ratingRepository.findAllNotDeclinedStudentRatingsByDateBetween(student.getId(), monthStart, monthEnd);
+        LOG.debug("Ratings that student have {}.\n Ratings that student want to save {}", currentMonthRatings, ratingDTO);
 
-	@Override
-	public List<Rating> findAllRatingsByIdStudentAndStageOfApproveGreaterThan(Long studentId) {
-		List<Rating> ratings = new ArrayList<>();
-		String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
-		DateTime currentDate = new DateTime();
-		DateTime monthStart = currentDate.dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
-		DateTime monthEnd = currentDate.dayOfMonth().withMaximumValue().withTimeAtStartOfDay();
+        List<Rating> duplicated = currentMonthRatings.stream()
+                .filter(r -> ratingDTO.stream()
+                        .anyMatch(rd ->
+                                r.getParagraph().getId().equals(rd.getParagraphId())))
+                .collect(Collectors.toList());
 
-		if(role.equals(Role.HEAD_OF_GROUP.getFullAuthority())) {
-			ratings = ratingRepository.findAllRatingsByIdStudentAndStageOfApproveIsEqual(studentId, UNAPROVED, monthStart.toDate(), monthEnd.toDate());
-		}
-		if(role.equals(Role.HEAD_OF_SO.getFullAuthority())) {
-			ratings = ratingRepository.findAllRatingsByIdStudentAndStageOfApproveIsEqual(studentId, APPROVED_BY_HEAD_OF_GROUP, monthStart.toDate(), monthEnd.toDate());
-		}
-		return ratings;
-	}
+        List<Paragraph> paragraphs = duplicated.stream()
+                .map(Rating::getParagraph).collect(Collectors.toList());
 
-	@Override
-	@Transactional
-	public List<Rating> approveRating(ActionRatingDTO actionRatingDTO) {
-		List<Rating> ratings = new ArrayList<>();
-		String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
-		if(role.equals(Role.HEAD_OF_GROUP.getFullAuthority())) {
-			actionRatingDTO.getRatingsId()
-					.forEach(id -> ratingRepository.changeStudentRatingApproveStage(APPROVED_BY_HEAD_OF_GROUP, id));
-			ratings = actionRatingDTO.getRatingsId().stream()
-					.map(id -> ratingRepository.findById(id).orElseThrow(() -> new StudentRatingBaseException(404, "Wrong rating id"))).collect(Collectors.toList());
-		}
-		if(role.equals(Role.HEAD_OF_SO.getFullAuthority())) {
-			actionRatingDTO.getRatingsId()
-					.forEach(id -> ratingRepository.changeStudentRatingApproveStage(APPROVED_BY_HEAD_OF_SO, id));
-			ratings = actionRatingDTO.getRatingsId().stream()
-					.map(id -> ratingRepository.findById(id).orElseThrow(() -> new StudentRatingBaseException(404, "Wrong rating id"))).collect(Collectors.toList());
-		}
+        if (!duplicated.isEmpty()) {
+            LOG.error("Duplicated rating was founded by student {}.\n {}", student.getUsername(), paragraphs);
+            throw new DuplicateRatingException(404, "Duplicated rating was found");
+        }
+        for (RatingDTO studentRating : ratingDTO) {
+            Paragraph paragraph = paragraphRepository.findById(studentRating.getParagraphId())
+                    .orElseThrow(() -> new StudentRatingBaseException(404, "Unknown paragraph id"));
+            if ((studentRating.getScore() == Double.parseDouble(paragraph.getScore()))
+                    || paragraph.getName().endsWith("*")) {
+                Rating rating = new Rating();
+                rating.setDate(new Date());
+                rating.setStageOfApprove(UNAPPROVED);
+                rating.setScore(studentRating.getScore());
+                rating.setComment(studentRating.getComment());
+                rating.setParagraph(paragraph);
+                rating.setStudent(student);
+                ratings.add(rating);
+            } else {
+                LOG.error("Student [{}] tried to save rating [{}] with score [{}] but original score is [{}]", student.getName(), paragraph.getName(), studentRating.getScore(), paragraph.getScore());
+                throw new StudentRatingBaseException(404, String.format("Paragraph %s doest have such score %s", paragraph.getName(), studentRating.getScore()));
+            }
+        }
+        return ratingRepository.saveAll(ratings);
+    }
 
-		return ratings;
-	}
+    @Override
+    public List<Rating> findAllRatingsByIdStudentAndStageOfApproveGreaterThan(Long studentId) {
+        List<Rating> ratings = new ArrayList<>();
+        Student currentStudent = studentService.getCurrentUser();
 
-	@Override
-	public List<Rating> findAllMonthStudentRatings(HttpSession session, Date date) {
-		Student student = (Student) session.getAttribute("student");
-		if(isNull(student)) {
-			LOG.error("No student in session");
-			throw new StudentRatingBaseException(404, "No student in session");
-		} else {
-			DateTime currentDate = new DateTime(date);
-			DateTime monthStart = currentDate.dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
-			DateTime monthEnd = currentDate.dayOfMonth().withMaximumValue().withTimeAtStartOfDay();
-			return ratingRepository.findAllRatingsByStudentIdAndDateBetween(student.getId(), monthStart.toDate(), monthEnd.toDate());
-		}
-	}
+        Date monthStart = DateTimeUtils.getCurrentMonthStart();
+        Date monthEnd = DateTimeUtils.getCurrentMonthEnd();
+
+        if (currentStudent.getRole() == HEAD_OF_GROUP) {
+            ratings = ratingRepository.findAllRatingsByIdStudentAndStageOfApproveIsEqual(studentId, UNAPPROVED, monthStart, monthEnd);
+        }
+        if (currentStudent.getRole() == HEAD_OF_SO) {
+            ratings = ratingRepository.findAllRatingsByIdStudentAndStageOfApproveIsEqual(studentId, APPROVED_BY_HEAD_OF_GROUP, monthStart, monthEnd);
+        }
+        return ratings;
+    }
+
+    @Override
+    @Transactional
+    public List<Rating> approveRating(ActionRatingDTO actionRatingDTO) {
+        List<Rating> ratings = new ArrayList<>();
+        Student currentStudent = studentService.getCurrentUser();
+        if (currentStudent.getRole() == HEAD_OF_GROUP) {
+            ratings = approve(actionRatingDTO, APPROVED_BY_HEAD_OF_GROUP);
+        }
+        if (currentStudent.getRole() == HEAD_OF_SO) {
+            ratings = approve(actionRatingDTO, APPROVED_BY_HEAD_OF_SO);
+        }
+
+        return ratings;
+    }
+
+    @Override
+    public List<Rating> findAllMonthStudentRatings(Date date) {
+        Student student = studentService.getCurrentUser();
+        if (isNull(student)) {
+            LOG.error("No student in session");
+            throw new StudentRatingBaseException(404, "No student in session");
+        } else {
+            Date monthStart = DateTimeUtils.getMonthStartByDate(date);
+            Date monthEnd = DateTimeUtils.getMonthEndByDate(date);
+            return ratingRepository.findAllRatingsByStudentIdAndDateBetween(student.getId(), monthStart, monthEnd);
+        }
+    }
+
+    private List<Rating> approve(ActionRatingDTO actionRatingDTO, Integer stageOfApprove) {
+        actionRatingDTO.getRatingsId()
+                .forEach(id -> ratingRepository.changeStudentRatingApproveStage(stageOfApprove, id));
+        return actionRatingDTO.getRatingsId().stream()
+                .map(id -> ratingRepository.findById(id).orElseThrow(() -> new StudentRatingBaseException(404, "Wrong rating id"))).collect(Collectors.toList());
+    }
 }

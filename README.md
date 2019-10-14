@@ -1,7 +1,7 @@
 # Student Rating
 ## This project should facilitate the calculation of the student's rating for receiving a scholarship.
 
-### Current version : 0.9.RELEASE (build 2478)
+### Current version : 1.0.RELEASE (build 3055)
 
 Change list:  
 
@@ -25,6 +25,7 @@ Version 0.8.RELEASE :
 - small bug and code fixes.
 
 Version 0.9.RELEASE :
+
 - clarified message when student ratings is not declined;
 - implemented new page "my-rating" where student can see his rating in scope month;
 - few bug-fixes in report service (work in progress);
@@ -35,3 +36,18 @@ Version 0.9.RELEASE :
 - refactored RatingDTO due implementing new process of approving student ratings;
 - fixed and refactored queries which bound with rating;
 - fixed sql-insert static data statement because some statement have duplicated items which violated process of application work.
+
+Version 1.0.RELEASE :
+
+- reworked report service and controller to return Resource by ResponseEntity;
+- decrease in student binding to the session (new DTO instead of entity);
+- fixed incorrect display student rating stage of approve for all system participants;
+- added application event logging feature for log in, rating fill, logout;
+- added new handlers in SecurityConfig to realization feature above;
+- session control via cookies;
+- fixed bug when the user via API (Postman,CurL) can post any grade of paragraph in rating saving flow;
+- new application banner;
+- added error controller for 403,404 HTTP status;
+- added exception handler for the application exception via ErrorInfoDTO;
+- added DateTime utils to simplify work with date/time and to avoid code duplication;
+- code refactoring and small bug fixing;

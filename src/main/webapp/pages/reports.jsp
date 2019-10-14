@@ -78,12 +78,12 @@
                             <div class="report-top-body">
                                 <c:choose>
                                     <c:when test="${sessionScope.student.role.getAuthority() == 'ROLE_HEAD_OF_GROUP'}">
-                                        <button type="button" class="btn btn-bg-report col btn-sm" onclick="location.href='/report_by_group'">По групі та студентах</button>
-                                        <button type="button" class="btn btn-bg-report col btn-sm" onclick="location.href='/avg_report_by_groups'">По групі загальний</button>
+                                        <button type="button" class="btn btn-bg-report col btn-sm" onclick="location.href='/reportByGroup'">По групі та студентах</button>
+                                        <button type="button" class="btn btn-bg-report col btn-sm" onclick="location.href='/avgReportByGroups'">По групі загальний</button>
                                     </c:when>
                                     <c:when test="${sessionScope.student.role.getAuthority() == 'ROLE_HEAD_OF_SO'}">
-                                        <button type="button" class="btn btn-bg-report col btn-sm" onclick="location.href='/report_by_group'">По всіх групах та їх студентах</button>
-                                        <button type="button" class="btn btn-bg-report col btn-sm" onclick="location.href='/avg_report_by_groups'">По групах загальний</button>
+                                        <button type="button" class="btn btn-bg-report col btn-sm" onclick="location.href='/reportByGroup'">По всіх групах та їх студентах</button>
+                                        <button type="button" class="btn btn-bg-report col btn-sm" onclick="location.href='/avgReportByGroups'">По групах загальний</button>
                                         <button type="button" class="btn btn-bg-report col btn-sm">Студенти за курсом</button>
                                     </c:when>
                                 </c:choose>

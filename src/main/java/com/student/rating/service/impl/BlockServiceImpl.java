@@ -8,6 +8,7 @@ import com.student.rating.service.BlockService;
 
 /**
  * Created by Тарас on 31.05.2018.
+ * @since 0.6
  */
 @Service
 public class BlockServiceImpl implements BlockService {

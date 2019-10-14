@@ -4,6 +4,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<c:set var="role" value="${sessionScope.student.role.getAuthority()}"/>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -37,13 +38,13 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Stud_Rating</a>
+                <a class="navbar-brand" href="#">Student Rating</a>
             </div>
 
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <c:choose>
-                        <c:when test="${requestScope.role=='[ROLE_HEAD_OF_GROUP]' || requestScope.role=='[ROLE_HEAD_OF_SO]'}">
+                        <c:when test="${role =='ROLE_HEAD_OF_GROUP' || role =='ROLE_HEAD_OF_SO'}">
                             <li><a href="/welcome"><span class="glyphicon glyphicon-home"></span>Головна</a></li>
                             <li><a href="/profile"><span class="glyphicon glyphicon-user"></span>Профіль</a></li>
                             <li><a href="/rating"><span class="glyphicon glyphicon-pencil"></span>Заповнити рейтинг</a></li>
@@ -51,7 +52,7 @@
                             <li><a href="/check-rating"><span class="glyphicon glyphicon-pencil"></span>Перевірити рейтинг</a></li>
                             <li><a href="/reports"><span class="glyphicon glyphicon-file"></span>Звіти</a></li>
                         </c:when>
-                        <c:when test="${requestScope.role=='[ROLE_STUDENT]'}">
+                        <c:when test="${role =='ROLE_STUDENT'}">
                             <li><a href="/welcome"><span class="glyphicon glyphicon-home"></span>Головна</a></li>
                             <li><a href="/profile"><span class="glyphicon glyphicon-user"></span>Профіль</a></li>
                             <li><a href="/rating"><span class="glyphicon glyphicon-pencil"></span>Заповнити рейтинг</a></li>
@@ -66,9 +67,12 @@
                     <div class="pull-right">
                         <div class="logout">
                             <sec:authorize access="isAuthenticated()">
-                                <p><sec:authentication property="principal.username"/><a class="btn btn-sm btn-primary"
-                                                                                         href="<c:url value="/logout" />"
-                                                                                         role="button">Вийти</a></p>
+                                <p><sec:authentication property="principal.username"/>
+                                    <a class="btn btn-sm btn-primary"
+                                       href="<c:url value="/logout" />"
+                                       role="button">Вийти
+                                    </a>
+                                </p>
                             </sec:authorize>
                         </div>
                     </div>
