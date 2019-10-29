@@ -14,8 +14,8 @@
 <spring:message htmlEscape="false" code="phone" var="phone"/>
 <spring:message htmlEscape="false" code="password" var="password"/>
 <spring:message htmlEscape="false" code="confirm_password" var="confrimPassword"/>
-<spring:message htmlEscape="false" code="promocode" var="promoCode"/>
-<spring:message htmlEscape="false" code="promo_code_tooltip" var="promoCodeTooltip"/>
+<spring:message htmlEscape="false" code="roleCode" var="roleCode"/>
+<spring:message htmlEscape="false" code="role_code_tooltip" var="roleCodeTooltip"/>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -75,10 +75,10 @@
                                 </div>
                             </spring:bind>
 
-                            <spring:bind path="promoCode">
+                            <spring:bind path="roleCode">
                                 <div class="form-group inner-addon left-addon ${status.error ? 'has-error' : ''}">
                                     <i class="glyphicon"><img class="img_nubip png" src="${contextPath}/pages/img/promocode.png"/></i>
-                                    <form:input type="text" path="promoCode" title="${promoCodeTooltip}" class="form-control" placeholder="${promoCode}"/>
+                                    <form:input type="text" path="roleCode" title="${roleCodeTooltip}" class="form-control" placeholder="${roleCode}"/>
                                 </div>
                             </spring:bind>
 

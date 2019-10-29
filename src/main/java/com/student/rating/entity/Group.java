@@ -22,8 +22,8 @@ public class Group implements Serializable {
     @Column(name = "group_name" , columnDefinition = "NVARCHAR(20)")
     private String name;
 
-    @OneToMany(mappedBy = "group" , cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "group" , cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    //@Fetch(FetchMode.SUBSELECT)
     private List<Student> students = new ArrayList<>();
 
     @ManyToOne

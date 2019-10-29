@@ -5,7 +5,7 @@
 
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
-<c:url value="/j_spring_security_check" var="loginUrl" />
+<c:url value="/j_spring_security_check" var="loginUrl"/>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -13,7 +13,8 @@
     <meta charset="utf-8">
     <title>ІС "Визначення рейтингу студента"</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" href="${contextPath}/pages/css/style.css"/>
 </head>
 <body>
@@ -29,19 +30,22 @@
                         рейтингу студента</h2>
                     <div class="col-md-2  mx-auto">
                         <form method="POST" action="${loginUrl}" class="form-signin">
-                            <div class="form-group ${error !=null ? 'has-error':''}">
-                            <div class="form-group inner-addon left-addon">
-                                <i class="glyphicon"><img class="img_nubip" src="${contextPath}/pages/img/user.png"/></i>
-                                <input name="username" type="text" class="form-control" aria-describedby="emailHelp" placeholder="<spring:message code="username"/>" autofocus="true">
-                            </div>
+                            <div class="form-group ${error !=null || session!=null  || sessionError!=null? 'has-error':''}">
+                                <div class="form-group inner-addon left-addon">
+                                    <i class="glyphicon"><img class="img_nubip" src="${contextPath}/pages/img/user.png"/></i>
+                                    <input name="username" type="text" class="form-control" aria-describedby="emailHelp"
+                                           placeholder="<spring:message code="username"/>" autofocus="true">
+                                </div>
 
-                            <div class="form-group inner-addon left-addon">
-                                <i class="glyphicon"><img class="img_nubip" src="${contextPath}/pages/img/pass.png"/></i>
-                                <input name="password" type="password" class="form-control" placeholder="<spring:message code="password"/>">
-                            </div>
+                                <div class="form-group inner-addon left-addon">
+                                    <i class="glyphicon"><img class="img_nubip" src="${contextPath}/pages/img/pass.png"/></i>
+                                    <input name="password" type="password" class="form-control" placeholder="<spring:message code="password"/>">
+                                </div>
                                 <span>${error}</span>
+                                <span>${session}</span>
+                                <span>${sessionError}</span>
                                 <input type="hidden" name="${_csrf.parametrName}" value="${_csrf.token}"/>
-                            <button type="submit" class="btn btn-primary col-sm-12"><spring:message code="login"/></button>
+                                <button type="submit" class="btn btn-primary col-sm-12"><spring:message code="login"/></button>
                                 <p class="text-center"><a href="/registration">Вперше на сайті?</a></p>
                             </div>
                         </form>
@@ -68,8 +72,11 @@
         </div>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 </body>
 </html>

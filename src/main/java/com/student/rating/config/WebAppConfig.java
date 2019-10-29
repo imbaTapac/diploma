@@ -192,7 +192,6 @@ public class WebAppConfig implements WebMvcConfigurer {
 		registry.addInterceptor(changeInterceptor());
 	}
 
-
 	@Bean
 	public ModelMapper getModelMapper() {
 		return new ModelMapper();

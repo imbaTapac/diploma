@@ -4,6 +4,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<c:set var="role" value="${sessionScope.student.role.getAuthority()}"/>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -77,37 +78,41 @@
                             </thead>
                                 <tbody id="tBody">
                                 <c:forEach items="${group.students}" var="student">
+                                 <c:set var="ratingStatus" value="${student.ratingStatus}"/>
                                 <tr>
                                     <td class="column"><c:out value="${counter}"/></td>
                                     <td><c:out value="${student.studentSurname}"/></td>
                                     <td><c:out value="${student.studentName}"/></td>
                                     <td><c:out value="${student.phone}"/></td>
                                     <c:choose>
-                                        <c:when test="${student.isRatingFilled()}">
+                                        <c:when test="${ratingStatus == '-2'}">
                                             <td class="text-danger status">Не заповнено</td>
                                         </c:when>
 
-                                        <c:when test="${student.isAllRatingDeclined()}">
+                                        <c:when test="${ratingStatus == '-1'}">
                                             <td class="text-dark status">Відхилено</td>
                                         </c:when>
 
-                                        <c:when test="${sessionScope.student.role.getAuthority() == 'ROLE_HEAD_OF_GROUP'}">
-                                            <c:if test="${student.isAllRatingUnaproved() || !student.isAllRatingUnaproved()}">
+                                        <c:when test="${role == 'ROLE_HEAD_OF_GROUP'}">
+                                            <c:if test="${ratingStatus == '0'}">
                                                 <td class="text-warning status">Потребує перевірки</td>
                                             </c:if>
-                                            <c:if test="${student.isAllApprovedByHeadOfGroup()}">
+                                            <c:if test="${ratingStatus == '1'}">
                                                 <td class="text-success status">Перевірено</td>
+                                            </c:if>
+                                            <c:if test="${ratingStatus == '2'}">
+                                                 <td class="text-success status">Перевірено головою СО</td>
                                             </c:if>
                                         </c:when>
 
-                                        <c:when test="${sessionScope.student.role.getAuthority() == 'ROLE_HEAD_OF_SO'}">
-                                            <c:if test="${student.isAllApprovedByHeadOfGroup()}">
+                                        <c:when test="${role == 'ROLE_HEAD_OF_SO'}">
+                                            <c:if test="${ratingStatus =='1'}">
                                                 <td class="text-warning status">Потребує перевірки</td>
                                             </c:if>
-                                            <c:if test="${student.isAllRatingUnaproved() || !student.isAllRatingUnaproved()}">
+                                            <c:if test="${ratingStatus == '0'}">
                                                 <td class="text-warning status">Потребує перевірки стростою</td>
                                             </c:if>
-                                            <c:if test="${student.isAllApprovedByHeadOfSo()}">
+                                            <c:if test="${ratingStatus == '2'}">
                                                 <td class="text-success status">Перевірено</td>
                                             </c:if>
                                         </c:when>

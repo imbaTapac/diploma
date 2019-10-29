@@ -7,9 +7,13 @@ import org.springframework.stereotype.Component;
 import com.student.rating.dto.StudentRatingDTO;
 import com.student.rating.entity.Rating;
 
+/**
+ * Mapping class of {@link com.student.rating.entity.Rating} in {@link com.student.rating.dto.StudentRatingDTO} and backward
+ * @since 0.9
+ */
 @Component
 public class StudentRatingDTOMapper implements AbstractDTOMapper<Rating, StudentRatingDTO> {
-	private ModelMapper modelMapper;
+	private final ModelMapper modelMapper;
 
 	@Autowired
 	public StudentRatingDTOMapper(ModelMapper modelMapper) {

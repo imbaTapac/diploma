@@ -1,7 +1,19 @@
 package com.student;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -74,6 +86,36 @@ public class EntityTests {
 		session.persist(block);
 		session.flush();
 	}
+
+	@Test
+	public void cipherTest() throws IOException, NoSuchAlgorithmException, KeyManagementException {
+		URL url = new URL("https://yandex.ua");
+		HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+		SSLContext context = SSLContext.getInstance("TLSv1.2");
+		SSLContext.setDefault(context);
+		context.init(null,null,null);
+		//context.getDefaultSSLParameters().setProtocols(new String[]{"TLSv1.0"});
+		//context.getDefaultSSLParameters().setCipherSuites(new String[]{"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"});
+		SSLSocket socket = (SSLSocket) context.getSocketFactory().createSocket("google.com",443);
+		socket.setEnabledCipherSuites(new String[]{"AES128-SHA"});
+		socket.setEnabledProtocols(new String[]{"TLSv1.2"});
+		socket.startHandshake();
+		//socket.startHandshake();
+		String[] test = socket.getEnabledProtocols();
+		for(String protocol: test) {
+			System.out.println(protocol);
+		}
+		String[] enabledCipherSuites = socket.getSupportedCipherSuites();
+
+		//con.connect();
+		//System.out.println(con.getCipherSuite());
+		System.out.println(socket.getSession().getCipherSuite());
+		System.out.println("Ciphers");
+		for(String cipher : enabledCipherSuites){
+			System.out.println(cipher);
+		}
+	}
+
 
 	@After
 	public void after() {

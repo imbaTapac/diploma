@@ -4,7 +4,7 @@ import static com.student.rating.constants.Constants.FACULTY_ATTRIBUTE;
 import static com.student.rating.constants.Constants.IT_FACULTY;
 import static com.student.rating.constants.Constants.ORGANIZATIONAL_PERSON;
 import static com.student.rating.constants.Constants.ROLE_ATTRIBUTE;
-import static com.student.rating.utility.StaticDataEngine.FACULTY_LIST;
+import static com.student.rating.utils.StaticDataEngine.FACULTY_LIST;
 
 import java.util.ArrayList;
 import java.util.List;
